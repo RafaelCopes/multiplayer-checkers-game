@@ -9,8 +9,8 @@ const INITIAL_BOARD_STATE = [
   [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 1, 0, 1, 0, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0, 0],
   [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0]
@@ -241,7 +241,7 @@ class CheckersGame {
   }
 }
 
-const game = new CheckersGame();
+/*const game = new CheckersGame();
 game.makeMove(2, 1, 3, 0);
 game.makeMove(5, 2, 4, 1);
 game.makeMove(2, 7, 3, 6);

@@ -20,7 +20,7 @@ app.use(cors());
 
 app.get('*', (req, res) => {
   //console.log(path.resolve(__dirname, '..', '..', 'client', 'index.html'))
-  res.sendFile(path.resolve(__dirname, '..', '..', 'client', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'client', 'index.html'));
 });
 
 let game = null;

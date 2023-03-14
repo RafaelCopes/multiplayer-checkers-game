@@ -1,6 +1,10 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { io } from 'socket.io-client';
 import Cell from "./Cell";
 import { Container, Content, Wrapper } from "./styles";
+
+let socket: any;
+const ENDPOINT = 'http://localhost:3000';
 
 const BOARD_SIZE = 8;
 
@@ -26,14 +30,46 @@ export default function Board(): JSX.Element {
   let colorize: number;
   const boardRef = useRef<HTMLDivElement>(null)
   const [piece, setPiece] = useState<IPiece | null>(null)
-  const [to, setTo] = useState<IPiece | null>(null)
+  const [drawBoard, setDrawBoard] = useState(INITIAL_BOARD_STATE);
+  const [turn, setTurn] = useState<IPiece | null>(null)
+
+  useEffect(() => {
+    /*const connectionOptions =  {
+      "forceNew" : true,
+      "reconnectionAttempts": "Infinity",
+      "timeout" : 10000,
+      "transports" : ["websocket"]
+    }*/
+    socket = io(ENDPOINT);
+
+  }, []);
+
+  useEffect(() => {
+    /*const connectionOptions =  {
+      "forceNew" : true,
+      "reconnectionAttempts": "Infinity",
+      "timeout" : 10000,
+      "transports" : ["websocket"]
+    }*/
+
+    socket.on('game', (game: any) => {
+      const {board, turn} = game;
+
+      setDrawBoard(drawBoard);
+      setTurn(turn);
+      console.log(drawBoard)
+      console.log(turn)
+    })
+
+  }, [socket]);
+
 
   for (let i = 0; i < BOARD_SIZE; i++) {
     for (let j = 0; j < BOARD_SIZE; j++) {
       colorize = i + j + 1;
       //console.log(i, j)
 
-      board.push(<Cell className={`${i} ${j}`} key={`${i}${j}`}  colorize={colorize} piece={INITIAL_BOARD_STATE[i][j]} />);
+      board.push(<Cell className={`${i} ${j}`} key={`${i}${j}`}  colorize={colorize} piece={drawBoard[i][j]} />);
     }
   }
 
