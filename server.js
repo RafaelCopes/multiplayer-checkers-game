@@ -44,6 +44,61 @@ io.on('connection', (socket) => {
     player1.emit('game', { board: game.getBoard(), turn: game.getTurn() });
     player2.emit('game', { board: game.getBoard(), turn: game.getTurn() });
 
+    player1.on('move', (data) => {
+      console.log('making move....')
+      console.log(data)
+      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+    
+      if (player !== socket) {
+        socket.emit('message', 'Not your turn');
+        return;
+      }
+    
+      if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
+
+        player.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+        opponent.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+
+        return;
+      }
+    
+      /*const winner = game.getWinner();
+      if (winner) {
+        player1.emit('winner', winner);
+        player2.emit('winner', winner);
+      } else {
+        player.emit('message', 'Invalid move');
+      }*/
+    });
+
+    player2.on('move', (data) => {
+      console.log('making move....')
+      console.log(data)
+      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+    
+      if (player !== socket) {
+        socket.emit('message', 'Not your turn');
+        return;
+      }
+    
+      if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
+        console.log('enter move')
+        player.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+        opponent.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+        return;
+      }
+    
+      /*const winner = game.getWinner();
+      if (winner) {
+        player1.emit('winner', winner);
+        player2.emit('winner', winner);
+      } else {
+        player.emit('message', 'Invalid move');
+      }*/
+    });
+
     return;
   }
 
@@ -60,30 +115,6 @@ io.on('disconnect', (socket) => {
     player2 = null;
     game = null;
   }
-});
-
-io.on('move', ({ fromRow, fromCol, toRow, toCol }) => {
-  const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
-  const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
-
-  if (player !== socket) {
-    socket.emit('message', 'Not your turn');
-    return;
-  }
-
-  if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
-    player.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-    opponent.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-    return;
-  }
-
-  /*const winner = game.getWinner();
-  if (winner) {
-    player1.emit('winner', winner);
-    player2.emit('winner', winner);
-  } else {
-    player.emit('message', 'Invalid move');
-  }*/
 });
 
 server.listen(PORT, () => {

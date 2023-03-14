@@ -9,8 +9,8 @@ const INITIAL_BOARD_STATE = [
   [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 1, 0, 1, 0, 1],
-  [0, 0, 0, 2, 0, 0, 0, 0],
-  [0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0]
@@ -202,6 +202,8 @@ class CheckersGame {
     }*/
     
     this.turn = (this.turn === BLACK_PIECE) ? WHITE_PIECE : BLACK_PIECE;
+
+    return true;
   }
   
   /*getWinner() {
@@ -280,6 +282,13 @@ console.log(game.getBoard().join("\n"));
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0]
 ];
+*/
+
+/*const game = new CheckersGame();
+game.makeMove(2, 5, 3, 4);
+game.makeMove(5, 6, 4, 5);
+game.makeMove(3, 4, 5, 6);
+console.log(game.getBoard().join("\n"));
 */
 
 module.exports = {CheckersGame};

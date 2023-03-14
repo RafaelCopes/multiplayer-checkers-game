@@ -9,14 +9,14 @@ const ENDPOINT = 'http://localhost:3000';
 const BOARD_SIZE = 8;
 
 const INITIAL_BOARD_STATE = [
-  [0, 1, 0, 3, 0, 1, 0, 1],
+  [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 1, 0, 1, 0, 1],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
-  [2, 0, 2, 0, 4, 0, 2, 0]
+  [2, 0, 2, 0, 2, 0, 2, 0]
 ];
 
 type IBoard = JSX.Element[];
@@ -55,10 +55,14 @@ export default function Board(): JSX.Element {
     socket.on('game', (game: any) => {
       const {board, turn} = game;
 
-      setDrawBoard(drawBoard);
+      setDrawBoard(board);
       setTurn(turn);
       console.log(drawBoard)
       console.log(turn)
+    })
+
+    socket.on('message', (message: any) => {
+      console.log(message)
     })
 
   }, [socket]);
@@ -87,9 +91,17 @@ export default function Board(): JSX.Element {
 
 
     if (piece === null) {
-      setPiece({x, y})
+      setPiece({x: Number.parseInt(x), y:Number.parseInt(y)})
     } else {
       console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`)
+
+      socket.emit('move', {
+        fromRow: piece.x,
+        fromCol: piece.y,
+        toRow: Number.parseInt(x),
+        toCol: Number.parseInt(y),
+      });
+
       setPiece(null)
     }
   }
