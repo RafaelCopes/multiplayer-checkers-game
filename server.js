@@ -3,7 +3,7 @@ const http = require('http');
 const { Server } = require("socket.io");
 const cors = require('cors');
 const path = require('path');
-const {CheckersGame} = require('./CheckersGame.js');
+const { CheckersTest } = require('./CheckersTest.js');
 
 const PORT = 3000;
 
@@ -40,15 +40,15 @@ io.on('connection', (socket) => {
     player2.emit('message', 'You are Player 2');
     console.log('You are Player 2');
     
-    game = new CheckersGame();
+    game = new CheckersTest();
     player1.emit('game', { board: game.getBoard(), turn: game.getTurn() });
     player2.emit('game', { board: game.getBoard(), turn: game.getTurn() });
 
     player1.on('move', (data) => {
       console.log('making move....')
       console.log(data)
-      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
-      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+      const player = (game.getTurn() === CheckersTest.BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === CheckersTest.BLACK_PIECE) ? player2 : player1;
     
       if (player !== socket) {
         socket.emit('message', 'Not your turn');
@@ -75,8 +75,8 @@ io.on('connection', (socket) => {
     player2.on('move', (data) => {
       console.log('making move....')
       console.log(data)
-      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
-      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+      const player = (game.getTurn() === CheckersTest.BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === CheckersTest.BLACK_PIECE) ? player2 : player1;
     
       if (player !== socket) {
         socket.emit('message', 'Not your turn');

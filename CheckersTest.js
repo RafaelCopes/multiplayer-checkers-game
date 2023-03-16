@@ -16,10 +16,14 @@ const INITIAL_BOARD = [
   [2, 0, 2, 0, 2, 0, 2, 0]
 ];
 
-class Checkers {
+class CheckersTest {
   constructor() {
     this.board = INITIAL_BOARD;
     this.turn = BLACK_PIECE;
+  }
+
+  isOutOfBounds(row, col) {
+    return row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE;
   }
 
   getPiece(row, col) {
@@ -39,6 +43,8 @@ class Checkers {
   }
 
   isValidMove(fromRow, fromCol, toRow, toCol) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
+    
     const piece = this.getPiece(fromRow, fromCol);
     const king = (piece === BLACK_KING || piece === WHITE_KING);
     const player = (piece === BLACK_PIECE || piece === BLACK_KING) ? BLACK_PIECE : WHITE_PIECE;
@@ -63,14 +69,15 @@ class Checkers {
       return true;
     }
 
-    //if (this.isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent)) {
-      //return true;
-    //}
+    if (this.isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent)) {
+      return true;
+    }
 
     return false;
   }
 
   canCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
     
     if (this.getPiece(toRow, toCol) !== EMPTY_SQUARE) {
       return false;
@@ -150,7 +157,7 @@ class Checkers {
     
     this.turn = (this.turn === BLACK_PIECE) ? WHITE_PIECE : BLACK_PIECE;
     
-    return false;
+    return true;
   } 
   
   getWinner() {
@@ -177,9 +184,12 @@ class Checkers {
     return null;
   }
 }  
-    
-const game = new Checkers();
-//game.makeMove(2, 5, 4, 3);
-//game.makeMove(5, 4, 3, 2);
-//game.makeMove(3, 4, 5, 6);
+/*    
+const game = new CheckersTest();
+game.makeMove(2, 1, 3, 2);
+game.makeMove(5, 0, 4, 1);
+game.makeMove(3, 2, 5, 0);
 console.log(game.getBoard().join("\n"));
+*/
+
+module.exports = { CheckersTest };

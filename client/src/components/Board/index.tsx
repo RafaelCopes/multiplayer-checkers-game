@@ -91,7 +91,7 @@ export default function Board(): JSX.Element {
 
 
     if (piece === null) {
-      setPiece({x: Number.parseInt(x), y:Number.parseInt(y)})
+      setPiece({x: Number.parseInt(x), y: Number.parseInt(y)})
     } else {
       console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`)
 
