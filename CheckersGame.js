@@ -30,7 +30,13 @@ class CheckersGame {
     this.board[row][col] = piece;
   }
 
+  isOutOfBounds(row, col) {
+    return row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE;
+  }
+
   isValidMove(fromRow, fromCol, toRow, toCol) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
+
     // get the moved piece
     const piece = this.getPiece(fromRow, fromCol);
     // check if piece is a king
@@ -52,7 +58,10 @@ class CheckersGame {
     }
 
     if (king) {
-      if (Math.abs(toRow - fromRow) !== 1 || Math.abs(toCol - fromCol) !== 1) {
+      //if (Math.abs(toRow - fromRow) !== 1 || Math.abs(toCol - fromCol) !== 1) {
+      //  return true;
+      //}
+      if (Math.abs(toRow - fromRow) === 1 || Math.abs(toCol - fromCol) === 1) {
         return true;
       }
     } else {
@@ -74,15 +83,17 @@ class CheckersGame {
     }
     console.log('out can capture')
 
-    if (this.isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent)) {
-      console.log('mullllllllllti jumppppppppp')
-      return true;
-    }
+    //if (this.isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent)) {
+      //console.log('mullllllllllti jumppppppppp')
+      //return true;
+    //}
 
     return false;
   }
 
   canCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
+
     /*const jumpRow = fromRow + 2 * (toRow - fromRow);
     const jumpCol = fromCol + 2 * (toCol - fromCol);
 
