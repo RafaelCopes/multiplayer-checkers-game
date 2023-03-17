@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const { CheckersGame } = require('./CheckersGame.js');
 
-const PORT = 3000;
+const PORT = 3333;
 
 const app = express();
 const server = http.createServer(app);
@@ -19,8 +19,7 @@ const io = new Server(server, {
 app.use(cors());
 
 app.get('*', (req, res) => {
-  //console.log(path.resolve(__dirname, '..', '..', 'client', 'index.html'))
-  res.sendFile(path.resolve(__dirname, 'client', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
 });
 
 let game = null;
@@ -30,36 +29,40 @@ let player2 = null;
 io.on('connection', (socket) => {
   if (!player1) {
     player1 = socket;
-    player1.emit('message', 'You are Player 1');
+    player1.emit('player', 1);
     console.log('You are Player 1');
     return;
   }
 
   if (!player2) {
     player2 = socket;
-    player2.emit('message', 'You are Player 2');
+    player2.emit('player', 2);
     console.log('You are Player 2');
     
     game = new CheckersGame();
-    player1.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-    player2.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+    player1.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
+    player2.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
 
-    player1.on('move', (data) => {
-      console.log('making move....')
-      console.log(data)
+    player1.on('makeMove', (data) => {
       const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
       const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
     
-      if (player !== socket) {
+      /*console.log(player.id, socket.id);
+      
+      if (player.id !== socket.id) {
         socket.emit('message', 'Not your turn');
         return;
-      }
+      }*/
     
       if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
 
-        player.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-        opponent.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-
+        player.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
+        opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
+        
+        if (game.getWinner() !== null) {
+          player.emit('winner', { winner: game.getWinner() });
+          opponent.emit('winner', { winner: game.getWinner() });
+        }
         return;
       }
     
@@ -72,21 +75,20 @@ io.on('connection', (socket) => {
       }*/
     });
 
-    player2.on('move', (data) => {
-      console.log('making move....')
-      console.log(data)
+    player2.on('makeMove', (data) => {
       const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
       const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
-    
-      if (player !== socket) {
+
+      /*console.log(player.id, socket.id);
+
+      if (player.id !== socket.id) {
         socket.emit('message', 'Not your turn');
         return;
-      }
+      }*/
     
       if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
-        console.log('enter move')
-        player.emit('game', { board: game.getBoard(), turn: game.getTurn() });
-        opponent.emit('game', { board: game.getBoard(), turn: game.getTurn() });
+        player.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
+        opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
         return;
       }
     
@@ -118,5 +120,5 @@ io.on('disconnect', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`The server is listening on port ${PORT}...`);
 });

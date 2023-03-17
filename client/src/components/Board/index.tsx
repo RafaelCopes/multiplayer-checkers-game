@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from 'socket.io-client';
 import Cell from "./Cell";
-import { Container, Content, Wrapper } from "./styles";
+import { Message } from "./styles";
+import { Container, Content, Wrapper, GameInfo } from "./styles";
 
 let socket: any;
-const ENDPOINT = 'http://localhost:3000';
+const ENDPOINT = 'http://localhost:3333';
 
 const BOARD_SIZE = 8;
 
@@ -16,22 +17,26 @@ const INITIAL_BOARD_STATE = [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
-  [2, 0, 2, 0, 2, 0, 2, 0]
+  [2, 0, 2, 0, 2, 0, 2, 0],
 ];
 
 type IBoard = JSX.Element[];
+
 type IPiece = {
   x: number,
   y: number,
-}
+};
 
 export default function Board(): JSX.Element {
   let board: IBoard = [];
   let colorize: number;
-  const boardRef = useRef<HTMLDivElement>(null)
-  const [piece, setPiece] = useState<IPiece | null>(null)
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [piece, setPiece] = useState<IPiece | null>(null);
   const [drawBoard, setDrawBoard] = useState(INITIAL_BOARD_STATE);
-  const [turn, setTurn] = useState<IPiece | null>(null)
+  const [turn, setTurn] = useState<number | null>(null);
+  const [player, setPlayer] = useState<number | null>(null);
+  const [message, setMessage] = useState<String | null>(null);
+  const [winner, setWinner] = useState<number | null>(null);
 
   useEffect(() => {
     /*const connectionOptions =  {
@@ -41,75 +46,104 @@ export default function Board(): JSX.Element {
       "transports" : ["websocket"]
     }*/
     socket = io(ENDPOINT);
-
   }, []);
 
   useEffect(() => {
-    /*const connectionOptions =  {
-      "forceNew" : true,
-      "reconnectionAttempts": "Infinity",
-      "timeout" : 10000,
-      "transports" : ["websocket"]
-    }*/
-
-    socket.on('game', (game: any) => {
+    socket.on('initializeGameState', (game: any) => {
       const {board, turn} = game;
 
       setDrawBoard(board);
       setTurn(turn);
-      console.log(drawBoard)
-      console.log(turn)
+    });
+
+    socket.on('updateGameState', (game: any) => {
+      const {board, turn} = game;
+
+      setDrawBoard(board);
+      setTurn(turn);
+      setMessage(null);
+    })
+
+    socket.on('player', (player: any) => {
+      setPlayer(player);
     })
 
     socket.on('message', (message: any) => {
-      console.log(message)
+      setMessage(message);
     })
 
+    socket.on('winner', (data: any) => {
+      const { winner } = data;
+      setWinner(winner);
+    })
   }, [socket]);
-
 
   for (let i = 0; i < BOARD_SIZE; i++) {
     for (let j = 0; j < BOARD_SIZE; j++) {
       colorize = i + j + 1;
-      //console.log(i, j)
 
-      board.push(<Cell className={`${i} ${j}`} key={`${i}${j}`}  colorize={colorize} piece={drawBoard[i][j]} />);
+      board.push(<Cell 
+        className={`${i} ${j}`} 
+        key={`${i}${j}`} 
+        isSelected={piece && drawBoard[i][j] !== 0 ? piece.x === i && piece.y === j : false} 
+        colorize={colorize} 
+        piece={drawBoard[i][j]} 
+      />);
     }
   }
 
-  const grabPiece = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    let classes = e.target.className.split(' ');
-    let x, y
-
-    if (classes.length === 2) {
-      x = classes[0]
-      y = classes[1]
-    } else {
-      x = classes[2]
-      y = classes[3]
+  const movePiece = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (turn !== player) {
+      setMessage('Not your turn!');
+      return;
     }
 
+    let classes = e.target.className.split(' ');
+    let x: string;
+    let y: string;
+
+    if (classes.length === 2) {
+      x = classes[0];
+      y = classes[1];
+    } else {
+      x = classes[2];
+      y = classes[3];
+    }
 
     if (piece === null) {
-      setPiece({x: Number.parseInt(x), y: Number.parseInt(y)})
+      setPiece({x: Number.parseInt(x), y: Number.parseInt(y)});
     } else {
-      console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`)
+      console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`);
+      
+      if (drawBoard[piece.x][piece.y] !== player && drawBoard[piece.x][piece.y] !== player + 2) {
+        setMessage('Not your piece!')
+        console.log(drawBoard[x][y])
+        setPiece(null);
+        return;
+      }
 
-      socket.emit('move', {
+      socket.emit('makeMove', {
         fromRow: piece.x,
         fromCol: piece.y,
         toRow: Number.parseInt(x),
         toCol: Number.parseInt(y),
       });
 
-      setPiece(null)
+      setPiece(null);
     }
   }
 
   return (
-    <Container >
+    <Container>
+      <GameInfo>
+        {message && <Message>Warning: {message}</Message>}
+        {winner && <h1>Winner: Player {winner}!</h1>}
+        {player && <h1>You are player {player}!</h1>}
+        {player && <h1>You play with the {player === 1 ? 'Black' : 'Red'} pieces!</h1>}
+        {turn ? <h1>Current turn: Player {turn}.</h1> : <h1>Waiting for opponent!</h1>}
+      </GameInfo>
       <Wrapper ref={boardRef}>
-        <Content onMouseDown={e => grabPiece(e)} >
+        <Content onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => movePiece(e)} >
           { board }
         </Content>
       </Wrapper>

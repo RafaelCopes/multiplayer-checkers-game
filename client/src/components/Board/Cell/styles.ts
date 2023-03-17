@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface IContainerProps {
   cellColor: 'red' | 'black';
+  isSelected: boolean;
 }
 
 const cellColorSelector = {
@@ -13,7 +14,13 @@ export const Container = styled.div<IContainerProps>`
   height: 72px;
   width: 72px;
 
-  background: ${({ cellColor }) => cellColorSelector[cellColor] };
+  background: ${({ cellColor, isSelected }) => {
+    if (isSelected) {  
+      return 'dimgray';
+    } else {
+      return cellColorSelector[cellColor];
+    }
+  } };
 
   display: flex;
   justify-content: center;
