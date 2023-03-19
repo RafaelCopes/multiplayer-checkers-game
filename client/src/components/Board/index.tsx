@@ -28,15 +28,17 @@ type IPiece = {
 };
 
 export default function Board(): JSX.Element {
-  let board: IBoard = [];
-  let colorize: number;
-  const boardRef = useRef<HTMLDivElement>(null);
   const [piece, setPiece] = useState<IPiece | null>(null);
-  const [drawBoard, setDrawBoard] = useState(INITIAL_BOARD_STATE);
+  const [currentBoardState, setCurrentBoardState] = useState(INITIAL_BOARD_STATE);
   const [turn, setTurn] = useState<number | null>(null);
   const [player, setPlayer] = useState<number | null>(null);
   const [message, setMessage] = useState<String | null>(null);
   const [winner, setWinner] = useState<number | null>(null);
+
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  let board: IBoard = [];
+  let colorize: number;
 
   useEffect(() => {
     /*const connectionOptions =  {
@@ -50,18 +52,19 @@ export default function Board(): JSX.Element {
 
   useEffect(() => {
     socket.on('initializeGameState', (game: any) => {
-      const {board, turn} = game;
+      const { board, turn } = game;
 
-      setDrawBoard(board);
+      setCurrentBoardState(board);
       setTurn(turn);
     });
 
     socket.on('updateGameState', (game: any) => {
-      const {board, turn} = game;
+      const { board, turn } = game;
 
-      setDrawBoard(board);
+      setCurrentBoardState(board);
       setTurn(turn);
       setMessage(null);
+      setWinner(null);
     })
 
     socket.on('player', (player: any) => {
@@ -85,9 +88,9 @@ export default function Board(): JSX.Element {
       board.push(<Cell 
         className={`${i} ${j}`} 
         key={`${i}${j}`} 
-        isSelected={piece && drawBoard[i][j] !== 0 ? piece.x === i && piece.y === j : false} 
+        isSelected={piece && currentBoardState[i][j] !== 0 ? piece.x === i && piece.y === j : false} 
         colorize={colorize} 
-        piece={drawBoard[i][j]} 
+        piece={currentBoardState[i][j]} 
       />);
     }
   }
@@ -115,9 +118,9 @@ export default function Board(): JSX.Element {
     } else {
       console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`);
       
-      if (drawBoard[piece.x][piece.y] !== player && drawBoard[piece.x][piece.y] !== player + 2) {
+      if (currentBoardState[piece.x][piece.y] !== player && currentBoardState[piece.x][piece.y] !== player + 2) {
         setMessage('Not your piece!')
-        console.log(drawBoard[x][y])
+        console.log(currentBoardState[x][y])
         setPiece(null);
         return;
       }

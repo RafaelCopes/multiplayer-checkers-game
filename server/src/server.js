@@ -19,7 +19,7 @@ const io = new Server(server, {
 app.use(cors());
 
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', 'client', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '..', '..', 'client', 'index.html'));
 });
 
 let game = null;
@@ -30,75 +30,55 @@ io.on('connection', (socket) => {
   if (!player1) {
     player1 = socket;
     player1.emit('player', 1);
-    console.log('You are Player 1');
+    console.log('Found player 1!');
     return;
   }
 
   if (!player2) {
     player2 = socket;
     player2.emit('player', 2);
-    console.log('You are Player 2');
+    console.log('Found player 2!');
     
     game = new CheckersGame();
+
     player1.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
     player2.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
 
     player1.on('makeMove', (data) => {
+      const { fromRow, fromCol, toRow, toCol } = data;
+
       const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
       const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
     
-      /*console.log(player.id, socket.id);
-      
-      if (player.id !== socket.id) {
-        socket.emit('message', 'Not your turn');
-        return;
-      }*/
-    
-      if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
-
+      if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
         player.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
         opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
-        
-        if (game.getWinner() !== null) {
+
+        if (game.getWinner()) {
           player.emit('winner', { winner: game.getWinner() });
           opponent.emit('winner', { winner: game.getWinner() });
         }
         return;
       }
-    
-      /*const winner = game.getWinner();
-      if (winner) {
-        player1.emit('winner', winner);
-        player2.emit('winner', winner);
-      } else {
-        player.emit('message', 'Invalid move');
-      }*/
     });
 
     player2.on('makeMove', (data) => {
+      const { fromRow, fromCol, toRow, toCol } = data;
+
       const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
       const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
-
-      /*console.log(player.id, socket.id);
-
-      if (player.id !== socket.id) {
-        socket.emit('message', 'Not your turn');
-        return;
-      }*/
     
-      if (game.makeMove(data.fromRow, data.fromCol, data.toRow, data.toCol)) {
+      if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
+
         player.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
         opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
+
+        if (game.getWinner()) {
+          player.emit('winner', { winner: game.getWinner() });
+          opponent.emit('winner', { winner: game.getWinner() });
+        }
         return;
       }
-    
-      /*const winner = game.getWinner();
-      if (winner) {
-        player1.emit('winner', winner);
-        player2.emit('winner', winner);
-      } else {
-        player.emit('message', 'Invalid move');
-      }*/
     });
 
     return;

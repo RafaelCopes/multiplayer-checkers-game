@@ -8,10 +8,10 @@ const RED_QUEEN = 4;
 const INITIAL_BOARD_STATE = [
   [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 0, 1, 0, 1],
+  [0, 3, 0, 1, 0, 1, 0, 1],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 2, 0, 2, 0],
+  [2, 0, 2, 0, 4, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0],
 ];
@@ -54,22 +54,17 @@ class CheckersGame {
     }
 
     if (queen) {
-      //const forward = (player === BLACK_PIECE) ? 1 : -1;
-
-      //if (this.canCapture(fromRow, fromCol, toRow, toCol, player, opponent)) {
-        //return true;
-      //}
-
-      if (Math.abs(toRow - fromRow) === 1 || Math.abs(toCol - fromCol) === 1) {
+      if (this.canQueenCapture(fromRow, fromCol, toRow, toCol, player, opponent)) {
+        if (this.isMultiJump(toRow, toCol, player, opponent)) {
+          this.turn = (this.turn === BLACK_PIECE) ? RED_PIECE : BLACK_PIECE;
+        }
+        
         return true;
       }
+
+      return false;
     } else {
       const forward = (player === BLACK_PIECE) ? 1 : -1;
-      // ????????????????????????????????????????????
-      // 3 4 2 3
-      
-      //console.log(toRow - fromRow)
-      //console.log(Math.abs(toCol - fromCol))
 
       if (toRow - fromRow === forward && Math.abs(toCol - fromCol) === 1) {
         return true;
@@ -77,29 +72,18 @@ class CheckersGame {
     }
 
     if (this.canCapture(fromRow, fromCol, toRow, toCol, player, opponent)) {
+      if (this.isMultiJump(toRow, toCol, player, opponent)) {
+        this.turn = (this.turn === BLACK_PIECE) ? RED_PIECE : BLACK_PIECE;
+      }
+
       return true;
     }
-
-    //if (this.isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent)) {
-      //console.log('mullllllllllti jumppppppppp')
-      //return true;
-    //}
 
     return false;
   }
 
   canCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
     if (this.isOutOfBounds(toRow, toCol)) return false;
-
-    /*const jumpRow = fromRow + 2 * (toRow - fromRow);
-    const jumpCol = fromCol + 2 * (toCol - fromCol);
-
-    if (jumpRow < 0 || jumpRow >= BOARD_SIZE || jumpCol < 0 || jumpCol >= BOARD_SIZE) {
-      console.log(' OUT OF BOUNDS!!!!!!')
-      return false;
-    }*/
-
-    const forward = (player === BLACK_PIECE) ? 1 : -1;
 
     if (this.getPiece(fromRow + (toRow - fromRow) / 2, fromCol + ((toCol - fromCol) / 2)) === EMPTY_SQUARE) {
       return false;
@@ -116,20 +100,80 @@ class CheckersGame {
     return true;
   }
 
-  isMultiJump(fromRow, fromCol, toRow, toCol, player, opponent) {
+  canQueenCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
+
+    const rowDistance = Math.abs(toRow - fromRow);
+    const colDistance = Math.abs(toCol - fromCol);
+
+    if (rowDistance !== colDistance) {
+      return false;
+    }
+
+     // Check if there are any pieces in the way
+    const rowDirection = toRow > fromRow ? 1 : -1;
+    const colDirection = toCol > fromCol ? 1 : -1;
+    
+    let i;
+    let row;
+    let col;
+    for (i = 1; i < rowDistance - 1; i++) {
+      row = fromRow + i * rowDirection;
+      col = fromCol + i * colDirection;
+      console.log(this.getPiece(row, col))
+      if (this.getPiece(row, col) !== EMPTY_SQUARE) {
+        return false;
+      }
+    }
+
+    row = fromRow + i * rowDirection;
+    col = fromCol + i * colDirection;
+    
+    const capturedPiece = this.getPiece(row, col);
+
+    if (capturedPiece !== EMPTY_SQUARE) {
+      if (capturedPiece !== opponent && capturedPiece !== opponent + 2) {
+        return false;
+      }
+  
+      this.setPiece(row, col, EMPTY_SQUARE);
+    }
+
+    return true;
+  }
+
+  multiCanCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+    if (this.isOutOfBounds(toRow, toCol)) return false;
+
+    if (this.getPiece(toRow, toCol) !== EMPTY_SQUARE) {
+      return false;
+    }
+
+    if (this.getPiece(fromRow + (toRow - fromRow) / 2, fromCol + ((toCol - fromCol) / 2)) === EMPTY_SQUARE) {
+      return false;
+    }
+
+    const middlePiece = this.getPiece(fromRow + (toRow - fromRow) / 2, fromCol + ((toCol - fromCol) / 2));
+
+    if (middlePiece !== opponent && middlePiece !== opponent + 2) {
+      return false;
+    }
+
+    return true;
+  }
+
+  isMultiJump(fromRow, fromCol, player, opponent) {
     for (let i = -2; i <= 2; i += 4) {
       for (let j = -2; j <= 2; j += 4) {
         const jumpRow = fromRow + i;
         const jumpCol = fromCol + j;
-        if (
-          this.isValidMove(fromRow, fromCol, jumpRow, jumpCol) && 
-          this.canCapture(fromRow, fromCol, jumpRow, jumpCol, player, opponent) &&
-          this.isValidMove(jumpRow, jumpCol, toRow, toCol)) {
+        
+        if (this.multiCanCapture(fromRow, fromCol, jumpRow, jumpCol, player, opponent)) {
           return true;
         }
       }
     }
-    
+
     return false;
   }
 
@@ -172,7 +216,7 @@ class CheckersGame {
     /*if (!queen && this.isMultiJump(toRow, toCol, toRow + 2, toCol + 2, player, opponent)) {
       return true;
     }*/
-    
+
     this.turn = (this.turn === BLACK_PIECE) ? RED_PIECE : BLACK_PIECE;
 
     return true;
