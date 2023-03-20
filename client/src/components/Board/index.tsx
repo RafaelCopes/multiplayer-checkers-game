@@ -5,7 +5,8 @@ import { Message } from "./styles";
 import { Container, Content, Wrapper, GameInfo } from "./styles";
 
 let socket: any;
-const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
+//const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
+const ENDPOINT = 'http://localhost:3333';
 
 const BOARD_SIZE = 8;
 
@@ -116,21 +117,21 @@ export default function Board(): any {
     if (piece === null) {
       setPiece({x: Number.parseInt(x), y: Number.parseInt(y)});
     } else {
-      console.log(`make move from ${piece.x} , ${piece.y} to ${x} , ${y}`);
       
-      if (currentBoardState[piece.x][piece.y] !== player && currentBoardState[piece.x][piece.y] !== player + 2) {
-        setMessage('Not your piece!')
-        console.log(currentBoardState[x][y])
-        setPiece(null);
-        return;
+      if (piece) {
+        if (currentBoardState[piece.x][piece.y] !== player && currentBoardState[piece.x][piece.y] !== player + 2) {
+          setMessage('Not your piece!')
+          setPiece(null);
+          return;
+        }
+  
+        socket.emit('makeMove', {
+          fromRow: piece.x,
+          fromCol: piece.y,
+          toRow: Number.parseInt(x),
+          toCol: Number.parseInt(y),
+        });
       }
-
-      socket.emit('makeMove', {
-        fromRow: piece.x,
-        fromCol: piece.y,
-        toRow: Number.parseInt(x),
-        toCol: Number.parseInt(y),
-      });
 
       setPiece(null);
     }
