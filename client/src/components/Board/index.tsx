@@ -5,8 +5,8 @@ import { Message } from "./styles";
 import { Container, Content, Wrapper, GameInfo } from "./styles";
 
 let socket: any;
-const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
-//const ENDPOINT = 'http://localhost:3333';
+//const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
+const ENDPOINT = 'http://localhost:3333';
 
 const BOARD_SIZE = 8;
 
