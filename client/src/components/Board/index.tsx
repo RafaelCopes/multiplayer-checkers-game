@@ -5,7 +5,7 @@ import { Message } from "./styles";
 import { Container, Content, Wrapper, GameInfo } from "./styles";
 
 let socket: any;
-const ENDPOINT = 'http://localhost:3333';
+const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
 
 const BOARD_SIZE = 8;
 
@@ -20,14 +20,14 @@ const INITIAL_BOARD_STATE = [
   [2, 0, 2, 0, 2, 0, 2, 0],
 ];
 
-type IBoard = JSX.Element[];
+type IBoard = any[];
 
 type IPiece = {
   x: number,
   y: number,
 };
 
-export default function Board(): JSX.Element {
+export default function Board(): any {
   const [piece, setPiece] = useState<IPiece | null>(null);
   const [currentBoardState, setCurrentBoardState] = useState(INITIAL_BOARD_STATE);
   const [turn, setTurn] = useState<number | null>(null);
@@ -95,7 +95,7 @@ export default function Board(): JSX.Element {
     }
   }
 
-  const movePiece = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const movePiece = (e: any) => {
     if (turn !== player) {
       setMessage('Not your turn!');
       return;
@@ -146,7 +146,7 @@ export default function Board(): JSX.Element {
         {turn ? <h1>Current turn: Player {turn}.</h1> : <h1>Waiting for opponent!</h1>}
       </GameInfo>
       <Wrapper ref={boardRef}>
-        <Content onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => movePiece(e)} >
+        <Content onMouseDown={(e: any) => movePiece(e)} >
           { board }
         </Content>
       </Wrapper>
