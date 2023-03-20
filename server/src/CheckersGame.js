@@ -202,28 +202,6 @@ class CheckersGame {
       this.setPiece(toRow, toCol, player === BLACK_PIECE ? BLACK_QUEEN : RED_QUEEN);
     }
 
-    // ?????????????
-    /*if (this.canCapture(toRow, toCol, toRow + 2, toCol + 2, player, opponent)) {
-      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-      this.setPiece(fromRow + 1, fromCol + 1, EMPTY_SQUARE);
-    } else if (this.canCapture(toRow, toCol, toRow + 2, toCol - 2, player, opponent)) {
-      console.log('bbbbbbbbbbbbbbbbbbbbbbbbbb')
-      
-      this.setPiece(fromRow + 1, fromCol - 1, EMPTY_SQUARE);
-    } else if (this.canCapture(toRow, toCol, toRow - 2, toCol + 2, player, opponent)) {
-      console.log('ccccccccccccccccccccccccccccc')
-
-      this.setPiece(fromRow - 1, fromCol + 1, EMPTY_SQUARE);
-    } else if (this.canCapture(toRow, toCol, toRow - 2, toCol - 2, player, opponent)) {
-      console.log('dddddddddddddddddddddddddddddd')
-
-      this.setPiece(fromRow - 1, fromCol - 1, EMPTY_SQUARE);
-    }*/
-
-    /*if (!queen && this.isMultiJump(toRow, toCol, toRow + 2, toCol + 2, player, opponent)) {
-      return true;
-    }*/
-
     this.turn = (this.turn === BLACK_PIECE) ? RED_PIECE : BLACK_PIECE;
 
     return true;
@@ -248,10 +226,7 @@ class CheckersGame {
       return RED_PIECE;
     } else if (redCount === 0) {
       return BLACK_PIECE;
-    } //else if (this.getValidMoves().length === 0) {
-      // if there are no valid moves for the current player, the other player wins
-      //return (this.turn === BLACK_PIECE) ? RED_PIECE : BLACK_PIECE;
-    //}
+    }
     
     return null;
   }

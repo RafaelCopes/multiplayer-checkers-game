@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from 'socket.io-client';
 import Cell from "./Cell";
-import { Message } from "./styles";
-import { Container, Content, Wrapper, GameInfo } from "./styles";
+import { Container, Content, GameInfo, Message, Wrapper } from "./styles";
 
 let socket: any;
-//const ENDPOINT = 'https://multiplayer-checkers-game.vercel.app';
 const ENDPOINT = 'http://localhost:3333';
 
 const BOARD_SIZE = 8;
@@ -86,12 +84,12 @@ export default function Board(): any {
     for (let j = 0; j < BOARD_SIZE; j++) {
       colorize = i + j + 1;
 
-      board.push(<Cell 
-        className={`${i} ${j}`} 
-        key={`${i}${j}`} 
-        isSelected={piece && currentBoardState[i][j] !== 0 ? piece.x === i && piece.y === j : false} 
-        colorize={colorize} 
-        piece={currentBoardState[i][j]} 
+      board.push(<Cell
+        className={`${i} ${j}`}
+        key={`${i}${j}`}
+        isSelected={piece && currentBoardState[i][j] !== 0 ? piece.x === i && piece.y === j : false}
+        colorize={colorize}
+        piece={currentBoardState[i][j]}
       />);
     }
   }
@@ -117,14 +115,14 @@ export default function Board(): any {
     if (piece === null) {
       setPiece({x: Number.parseInt(x), y: Number.parseInt(y)});
     } else {
-      
+
       if (piece) {
         if (currentBoardState[piece.x][piece.y] !== player && currentBoardState[piece.x][piece.y] !== player + 2) {
           setMessage('Not your piece!')
           setPiece(null);
           return;
         }
-  
+
         socket.emit('makeMove', {
           fromRow: piece.x,
           fromCol: piece.y,

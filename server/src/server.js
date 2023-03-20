@@ -88,17 +88,6 @@ io.on('connection', (socket) => {
       player1 = null;
       player2 = null;
       game = null; 
-      /*if (socket === player1) {
-        console.log('Player 1 disconected!')
-        player1 = null;
-        game = null;
-      }
-    
-      if (socket === player2) {
-        console.log('Player 2 disconected!')
-        player2 = null;
-        game = null;
-      }*/
     });
 
     return;
