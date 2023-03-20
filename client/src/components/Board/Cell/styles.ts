@@ -5,10 +5,23 @@ interface IContainerProps {
   isSelected: boolean;
 }
 
+interface IPieceProps {
+  imageSrc: string;
+}
+
 const cellColorSelector = {
   black: '#0d0a02',
   red: 'red',
 }
+
+export const Piece = styled.div<IPieceProps>`
+  background-image: url(${({ imageSrc }) => imageSrc});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60px;
+  width: 72px;
+  height: 72px;
+`;
 
 export const Container = styled.div<IContainerProps>`
   height: 72px;
@@ -25,9 +38,4 @@ export const Container = styled.div<IContainerProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-
-  img {
-    width: 60px;
-    height: 60px;
-  }
 `;

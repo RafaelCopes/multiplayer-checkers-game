@@ -29,14 +29,14 @@ let player2 = null;
 io.on('connection', (socket) => {
   if (!player1) {
     player1 = socket;
-    player1.emit('player', 1);
+    player1.emit('getPlayer', 1);
     console.log('Found player 1!');
     return;
   }
 
   if (!player2) {
     player2 = socket;
-    player2.emit('player', 2);
+    player2.emit('getPlayer', 2);
     console.log('Found player 2!');
     
     game = new CheckersGame();
@@ -55,8 +55,8 @@ io.on('connection', (socket) => {
         opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
 
         if (game.getWinner()) {
-          player.emit('winner', { winner: game.getWinner() });
-          opponent.emit('winner', { winner: game.getWinner() });
+          player.emit('getWinner', { winner: game.getWinner() });
+          opponent.emit('getWinner', { winner: game.getWinner() });
         }
         return;
       }
@@ -74,29 +74,37 @@ io.on('connection', (socket) => {
         opponent.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
 
         if (game.getWinner()) {
-          player.emit('winner', { winner: game.getWinner() });
-          opponent.emit('winner', { winner: game.getWinner() });
+          player.emit('getWinner', { winner: game.getWinner() });
+          opponent.emit('getWinner', { winner: game.getWinner() });
         }
         return;
       }
     });
 
+    socket.on('disconnect', (socket) => {
+      player1.emit('getMessage', 'Opponent disconnected, reload your window to find a new game!');
+      player2.emit('getMessage', 'Opponent disconnected, reload your window to find a new game!');
+
+      player1 = null;
+      player2 = null;
+      game = null; 
+      /*if (socket === player1) {
+        console.log('Player 1 disconected!')
+        player1 = null;
+        game = null;
+      }
+    
+      if (socket === player2) {
+        console.log('Player 2 disconected!')
+        player2 = null;
+        game = null;
+      }*/
+    });
+
     return;
   }
 
-  socket.emit('message', 'Game in progress');
-});
-
-io.on('disconnect', (socket) => {
-  if (socket === player1) {
-    player1 = null;
-    game = null;
-  }
-
-  if (socket === player2) {
-    player2 = null;
-    game = null;
-  }
+  socket.emit('getMessage', 'There is already a game in progress. Wait for it to end!');
 });
 
 server.listen(PORT, () => {

@@ -67,15 +67,15 @@ export default function Board(): JSX.Element {
       setWinner(null);
     })
 
-    socket.on('player', (player: any) => {
+    socket.on('getPlayer', (player: any) => {
       setPlayer(player);
     })
 
-    socket.on('message', (message: any) => {
+    socket.on('getMessage', (message: any) => {
       setMessage(message);
     })
 
-    socket.on('winner', (data: any) => {
+    socket.on('getWinner', (data: any) => {
       const { winner } = data;
       setWinner(winner);
     })

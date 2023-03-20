@@ -1,4 +1,4 @@
-import { Container } from "./styles";
+import { Container, Piece } from "./styles";
 
 interface ICellProps {
   colorize: number;
@@ -12,25 +12,25 @@ export default function Cell({ colorize, piece, className, isSelected }: ICellPr
     if (piece === 1) {
       return (
         <Container isSelected={isSelected} cellColor="black">
-          <img className={className} src='./assets/black-checker/standard.png' alt="black-checker" />
+          <Piece className={className} imageSrc={'./assets/black-checker/standard.png'} />
         </Container>
       );
     } else if (piece === 3) {
       return (
         <Container isSelected={isSelected} cellColor="black">
-          <img className={className} src='./assets/black-checker/king-me.png' alt="black-checker" />
+          <Piece className={className} imageSrc={'./assets/black-checker/king-me.png'} />
         </Container>
       );
     } else if (piece === 2) {
       return (
         <Container isSelected={isSelected} cellColor="black">
-          <img className={className} src='assets/red-checker/standard.png' alt="red-checker" />
+          <Piece className={className} imageSrc={'assets/red-checker/standard.png'} />
         </Container>
       );
     } else if (piece === 4) {
       return (
         <Container isSelected={isSelected} cellColor="black">
-          <img className={className} src='assets/red-checker/king-me.png' alt="red-checker" />
+          <Piece className={className} imageSrc={'assets/red-checker/king-me.png'} />
         </Container>
       );
     } else {
@@ -43,25 +43,25 @@ export default function Cell({ colorize, piece, className, isSelected }: ICellPr
   if (piece === 1) {
     return (
       <Container isSelected={isSelected} cellColor="red">
-        <img className={className} src='./assets/black-checker/standard.png' alt="black-checker" />
+        <Piece className={className} imageSrc={'./assets/black-checker/standard.png'} />
       </Container>
     );
   } else if (piece === 3) {
     return (
       <Container isSelected={isSelected} cellColor="red">
-        <img className={className} src='./assets/black-checker/king-me.png' alt="black-checker" />
+        <Piece className={className} imageSrc={'./assets/black-checker/king-me.png'} />
       </Container>
     );
   } else if (piece === 2) {
     return (
       <Container isSelected={isSelected} cellColor="red">
-        <img className={className} src='assets/red-checker/standard.png' alt="red-checker" />
+        <Piece className={className} imageSrc={'assets/red-checker/standard.png'} />
       </Container>
     );
   } else if (piece === 4) {
     return (
       <Container isSelected={isSelected} cellColor="red">
-        <img className={className} src='assets/red-checker/king-me.png' alt="red-checker" />
+        <Piece className={className} imageSrc={'assets/red-checker/king-me.png'} />
       </Container>
     );
   } else {

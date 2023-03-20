@@ -8,10 +8,10 @@ const RED_QUEEN = 4;
 const INITIAL_BOARD_STATE = [
   [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],
-  [0, 3, 0, 1, 0, 1, 0, 1],
+  [0, 1, 0, 1, 0, 1, 0, 1],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 4, 0, 2, 0],
+  [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0],
 ];
@@ -65,6 +65,13 @@ class CheckersGame {
       return false;
     } else {
       const forward = (player === BLACK_PIECE) ? 1 : -1;
+
+      const rowDistance = Math.abs(toRow - fromRow);
+      const colDistance = Math.abs(toCol - fromCol);
+  
+      if (rowDistance !== colDistance) {
+        return false;
+      }
 
       if (toRow - fromRow === forward && Math.abs(toCol - fromCol) === 1) {
         return true;
@@ -120,7 +127,7 @@ class CheckersGame {
     for (i = 1; i < rowDistance - 1; i++) {
       row = fromRow + i * rowDirection;
       col = fromCol + i * colDirection;
-      console.log(this.getPiece(row, col))
+      
       if (this.getPiece(row, col) !== EMPTY_SQUARE) {
         return false;
       }
