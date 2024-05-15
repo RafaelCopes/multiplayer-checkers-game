@@ -38,4 +38,8 @@ export const Container = styled.div<IContainerProps>`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &:hover {
+    border: 3px solid grey;
+  }
 `;

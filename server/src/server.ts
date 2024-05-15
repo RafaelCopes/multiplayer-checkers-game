@@ -1,9 +1,10 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require("socket.io");
-const cors = require('cors');
-const path = require('path');
-const { CheckersGame } = require('./CheckersGame.js');
+import express from 'express';
+import http from 'http';
+import { Server } from "socket.io";
+import cors from 'cors';
+import path from 'path';
+import { CheckersGame } from './checkers-game.js';
+import { BLACK_PIECE } from './constants.js';
 
 const PORT = 3333;
 
@@ -22,9 +23,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '..', '..', 'client', 'index.html'));
 });
 
-let game = null;
-let player1 = null;
-let player2 = null;
+let game: CheckersGame | null;
+let player1: any = null;
+let player2: any = null;
 
 io.on('connection', (socket) => {
   if (!player1) {
@@ -41,14 +42,17 @@ io.on('connection', (socket) => {
     
     game = new CheckersGame();
 
+
     player1.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
     player2.emit('initializeGameState', { board: game.getBoard(), turn: game.getTurn() });
 
-    player1.on('makeMove', (data) => {
+    player1.on('makeMove', (data: any) => {
       const { fromRow, fromCol, toRow, toCol } = data;
 
-      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
-      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+      if (!game) return;
+
+      const player = (game.getTurn() === BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === BLACK_PIECE) ? player2 : player1;
     
       if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
         player.emit('updateGameState', { board: game.getBoard(), turn: game.getTurn() });
@@ -58,6 +62,7 @@ io.on('connection', (socket) => {
           player.emit('getWinner', { winner: game.getWinner() });
           opponent.emit('getWinner', { winner: game.getWinner() });
         }
+        
         return;
       }
     });
@@ -65,8 +70,10 @@ io.on('connection', (socket) => {
     player2.on('makeMove', (data) => {
       const { fromRow, fromCol, toRow, toCol } = data;
 
-      const player = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player1 : player2;
-      const opponent = (game.getTurn() === CheckersGame.BLACK_PIECE) ? player2 : player1;
+      if (!game) return;
+
+      const player = (game.getTurn() === BLACK_PIECE) ? player1 : player2;
+      const opponent = (game.getTurn() === BLACK_PIECE) ? player2 : player1;
     
       if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
 

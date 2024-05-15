@@ -1,40 +1,35 @@
-const BOARD_SIZE = 8;
-const EMPTY_SQUARE = 0;
-const BLACK_PIECE = 1;
-const RED_PIECE = 2;
-const BLACK_QUEEN = 3;
-const RED_QUEEN = 4;
+import { 
+  INITIAL_BOARD_STATE,
+  BOARD_SIZE, 
+  EMPTY_SQUARE, 
+  BLACK_PIECE, 
+  BLACK_QUEEN, 
+  RED_PIECE, 
+  RED_QUEEN,
+} from './constants';
 
-const INITIAL_BOARD_STATE = [
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 1, 0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-  [0, 2, 0, 2, 0, 2, 0, 2],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-];
+export class CheckersGame {
+  private board: any;
+  private turn: any;
 
-class CheckersGame {
   constructor() {
     this.board = INITIAL_BOARD_STATE;
     this.turn = BLACK_PIECE;
   }
-
-  getPiece(row, col) {
+ 
+  getPiece(row: number, col: number) {
     return this.board[row][col];
   }
 
-  setPiece(row, col, piece) {
+  setPiece(row: string | number, col: string | number, piece: number) {
     this.board[row][col] = piece;
   }
 
-  isOutOfBounds(row, col) {
+  isOutOfBounds(row: number, col: number) {
     return row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE;
   }
 
-  isValidMove(fromRow, fromCol, toRow, toCol) {
+  isValidMove(fromRow: number, fromCol: number, toRow: number, toCol: number) {
     if (this.isOutOfBounds(toRow, toCol)) return false;
 
     // get the moved piece
@@ -89,7 +84,7 @@ class CheckersGame {
     return false;
   }
 
-  canCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+  canCapture(fromRow: number, fromCol: number, toRow: number, toCol: number, player: number, opponent: number) {
     if (this.isOutOfBounds(toRow, toCol)) return false;
 
     if (this.getPiece(fromRow + (toRow - fromRow) / 2, fromCol + ((toCol - fromCol) / 2)) === EMPTY_SQUARE) {
@@ -107,7 +102,7 @@ class CheckersGame {
     return true;
   }
 
-  canQueenCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+  canQueenCapture(fromRow: number, fromCol: number, toRow: number, toCol: number, player: number, opponent: number) {
     if (this.isOutOfBounds(toRow, toCol)) return false;
 
     const rowDistance = Math.abs(toRow - fromRow);
@@ -149,7 +144,7 @@ class CheckersGame {
     return true;
   }
 
-  multiCanCapture(fromRow, fromCol, toRow, toCol, player, opponent) {
+  multiCanCapture(fromRow: number, fromCol: number, toRow: number, toCol: number, player: any, opponent: number) {
     if (this.isOutOfBounds(toRow, toCol)) return false;
 
     if (this.getPiece(toRow, toCol) !== EMPTY_SQUARE) {
@@ -169,7 +164,7 @@ class CheckersGame {
     return true;
   }
 
-  isMultiJump(fromRow, fromCol, player, opponent) {
+  isMultiJump(fromRow: number, fromCol: number, player: number, opponent: number) {
     for (let i = -2; i <= 2; i += 4) {
       for (let j = -2; j <= 2; j += 4) {
         const jumpRow = fromRow + i;
@@ -184,7 +179,7 @@ class CheckersGame {
     return false;
   }
 
-  makeMove(fromRow, fromCol, toRow, toCol) {
+  makeMove(fromRow: number, fromCol: number, toRow: number, toCol: any) {
     const piece = this.getPiece(fromRow, fromCol);
     const queen = (piece === BLACK_QUEEN || piece === RED_QUEEN);
     const player = (piece === BLACK_PIECE || piece === BLACK_QUEEN) ? BLACK_PIECE : RED_PIECE;
@@ -239,5 +234,3 @@ class CheckersGame {
     return this.turn;
   }
 }
-
-module.exports = { CheckersGame };
