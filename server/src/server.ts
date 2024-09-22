@@ -78,6 +78,14 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('checkGameExists', (roomId) => {
+    if (games[roomId]) {
+      socket.emit('gameExists', true);
+    } else {
+      socket.emit('gameExists', false);
+    }
+  });
+
   socket.on('makeMove', (data) => {
     const { fromRow, fromCol, toRow, toCol } = data;
     const roomId = socket.data.roomId;
