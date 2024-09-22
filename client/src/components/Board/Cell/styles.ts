@@ -3,6 +3,7 @@ import styled from "styled-components";
 interface IContainerProps {
   cellColor: 'red' | 'black';
   isSelected: boolean;
+  isValidMove: boolean;
 }
 
 interface IPieceProps {
@@ -10,8 +11,8 @@ interface IPieceProps {
 }
 
 const cellColorSelector = {
-  black: '#0d0a02',
-  red: 'red',
+  black: '#403737',
+  red: '#d12121',
 }
 
 export const Piece = styled.div<IPieceProps>`
@@ -21,18 +22,25 @@ export const Piece = styled.div<IPieceProps>`
   background-size: 60px;
   width: 72px;
   height: 72px;
+
+  cursor: pointer;
 `;
 
 export const Container = styled.div<IContainerProps>`
   height: 72px;
   width: 72px;
 
-  background: ${({ cellColor, isSelected }) => {
+  background: ${({ cellColor, isSelected, isValidMove }) => {
+    if (isValidMove) {
+      return 'gold';
+    }
+
     if (isSelected) {  
       return 'dimgray';
     } else {
       return cellColorSelector[cellColor];
     }
+
   } };
 
   display: flex;
