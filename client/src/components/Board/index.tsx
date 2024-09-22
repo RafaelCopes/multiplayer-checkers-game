@@ -111,64 +111,66 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
     }
   }
 
-  // Handle player move
   const movePiece = (e: any) => {
     if (turn !== player) {
       setMessage('Not your turn!');
       return;
     }
-
+  
     let target = e.target;
-
+  
     // Traverse up the DOM tree if necessary to find the element with data attributes
     while (target && !target.dataset.row) {
       target = target.parentNode;
     }
-
+  
     if (!target || !target.dataset.row || !target.dataset.col) {
       // Invalid target, exit the function
       return;
     }
-
+  
     const x = parseInt(target.dataset.row, 10);
     const y = parseInt(target.dataset.col, 10);
-
+  
     if (isNaN(x) || isNaN(y)) {
       // Invalid coordinates, exit the function
       return;
     }
-
+  
+    const clickedPiece = currentBoardState[x][y];
+  
     if (piece === null) {
-      setPiece({ x, y });
-
-      socket.emit('getValidMoves', {
-        roomId,
-        row: x,
-        col: y,
-      });
-    } else {
-      if (piece) {
-        if (currentBoardState[piece.x][piece.y] !== player && currentBoardState[piece.x][piece.y] !== player + 2) {
-          setMessage('Not your piece!');
-          setPiece(null);
-          setValidMoves(null);
-
-          return;
-        }
-
-        // Emit move to server
-        socket.emit('makeMove', {
-          fromRow: piece.x,
-          fromCol: piece.y,
-          toRow: x,
-          toCol: y,
-        });
+      // No piece currently selected
+      if (clickedPiece === player || clickedPiece === player + 2) {
+        // Select the piece and get valid moves
+        setPiece({ x, y });
+        socket.emit('getValidMoves', { roomId, row: x, col: y });
+      } else {
+        setMessage('Not your piece!');
       }
-
-      setPiece(null);
-      setValidMoves(null);
+    } else {
+      // A piece is already selected
+      if (clickedPiece === player || clickedPiece === player + 2) {
+        // Change selection to the new piece
+        setPiece({ x, y });
+        socket.emit('getValidMoves', { roomId, row: x, col: y });
+      } else {
+        // Attempt to make a move from the selected piece to the clicked square
+        if (piece) {
+          socket.emit('makeMove', {
+            fromRow: piece.x,
+            fromCol: piece.y,
+            toRow: x,
+            toCol: y,
+          });
+        }
+  
+        setPiece(null);
+        setValidMoves(null);
+      }
     }
   };
+  
 
   return (
     <Container>
