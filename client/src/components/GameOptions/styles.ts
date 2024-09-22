@@ -1,16 +1,33 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
+export const Wrapper = styled.div`
   height: 100vh;
 
   background: black;
   color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;  
+`;
+
+export const Container = styled.div`
+  border: 5px solid dimgray;
+  background: #403737;
+
+  height: 576px;
   
+  padding: 25px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+
+  border-radius: 8px;
+
+  gap: 55px;
 
 	p {
 		font-size: 1.2rem;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container } from './styles';
+import { Container, Wrapper } from './styles';
 
 export default function GameOptions({ socket }: any) { // Accept the socket as a prop
   const [roomId, setRoomId] = useState('');
@@ -25,7 +25,8 @@ export default function GameOptions({ socket }: any) { // Accept the socket as a
   };
 
   return (
-    <Container>
+    <Wrapper>
+      <Container>
       <h1>Welcome to Copes Checkers</h1>
       <button onClick={handleCreateGame}>Create a Game</button>
       <p>or</p>
@@ -39,5 +40,7 @@ export default function GameOptions({ socket }: any) { // Accept the socket as a
         <button onClick={handleJoinGame}>Join Game</button>
       </div>
     </Container>
+    </Wrapper>
+    
   );
 }
