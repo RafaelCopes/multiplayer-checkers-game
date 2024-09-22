@@ -119,13 +119,12 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
   
     let target = e.target;
   
-    // Traverse up the DOM tree if necessary to find the element with data attributes
+    // Traverse up the DOM tree to find the element with data attributes
     while (target && !target.dataset.row) {
       target = target.parentNode;
     }
   
     if (!target || !target.dataset.row || !target.dataset.col) {
-      // Invalid target, exit the function
       return;
     }
   
@@ -133,7 +132,6 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
     const y = parseInt(target.dataset.col, 10);
   
     if (isNaN(x) || isNaN(y)) {
-      // Invalid coordinates, exit the function
       return;
     }
   
@@ -155,16 +153,15 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
         setPiece({ x, y });
         socket.emit('getValidMoves', { roomId, row: x, col: y });
       } else {
-        // Attempt to make a move from the selected piece to the clicked square
-        if (piece) {
-          socket.emit('makeMove', {
-            fromRow: piece.x,
-            fromCol: piece.y,
-            toRow: x,
-            toCol: y,
-          });
-        }
+        // Attempt to make a move
+        socket.emit('makeMove', {
+          fromRow: piece.x,
+          fromCol: piece.y,
+          toRow: x,
+          toCol: y,
+        });
   
+        // Unselect the piece and clear valid moves
         setPiece(null);
         setValidMoves(null);
       }
@@ -184,8 +181,8 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
         )}
         
         <CapturedPieces>
-          {Array.from({ length: redCapturesPieces }).map((_, index) => (
-            <CapturedPiece key={index} color="red" />
+          {Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
+            <CapturedPiece key={index} color={player === 1 ? "red" : "black"} />
           ))}
         </CapturedPieces>
 
@@ -206,8 +203,8 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
         ) : <h1>Waiting for the opponent.</h1>
         }
         <CapturedPieces>
-          {Array.from({ length: blackCapturesPieces }).map((_, index) => (
-            <CapturedPiece key={index} color="black" />
+          {Array.from({ length: player === 1 ? blackCapturesPieces : redCapturesPieces  }).map((_, index) => (
+            <CapturedPiece key={index} color={player === 1 ? "black" : "red"} />
           ))}
         </CapturedPieces>
       </GameInfo>
