@@ -18,7 +18,16 @@ export default function GameOptions({ socket }: any) { // Accept the socket as a
 
   const handleJoinGame = () => {
     if (roomId) {
-      navigate(`/game/${roomId}`); // Navigate to the game with the room ID
+      socket.emit('checkGameExists', roomId);
+       // Use the existing socket
+      socket.on('gameExists', (exists: boolean) => {
+        if (exists) {
+          navigate(`/game/${roomId}`); // Navigate to the game with the room ID
+        } else {
+          alert('Room not found. Please enter a valid Room ID.');
+          setRoomId('');
+        }
+      });
     } else {
       alert('Please enter a valid Room ID.');
     }
@@ -27,18 +36,18 @@ export default function GameOptions({ socket }: any) { // Accept the socket as a
   return (
     <Wrapper>
       <Container>
-      <h1>Welcome to Copes Checkers</h1>
-      <button onClick={handleCreateGame}>Create a Game</button>
-      <p>or</p>
-      <div>
-        <input
-          type="text"
-          placeholder="Enter Room ID"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
-        />
-        <button onClick={handleJoinGame}>Join Game</button>
-      </div>
+        <h1>Welcome to Copes Checkers</h1>
+        <button onClick={handleCreateGame}>Create a Game</button>
+        <p>or</p>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Room ID"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          />
+          <button onClick={handleJoinGame}>Join Game</button>
+        </div>
     </Container>
     </Wrapper>
     
