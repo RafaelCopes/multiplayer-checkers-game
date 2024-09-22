@@ -50,6 +50,5 @@ export default function GameOptions({ socket }: any) { // Accept the socket as a
         </div>
     </Container>
     </Wrapper>
-    
   );
 }

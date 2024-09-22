@@ -20,9 +20,10 @@ export const Piece = styled.div<IPieceProps>`
   background-repeat: no-repeat;
   background-position: center;
   background-size: 60px;
-  width: 72px;
-  height: 72px;
 
+  height: 100%;
+  width: 100%;
+  
   cursor: pointer;
 `;
 
@@ -32,7 +33,7 @@ export const Container = styled.div<IContainerProps>`
 
   background: ${({ cellColor, isSelected, isValidMove }) => {
     if (isValidMove) {
-      return 'gold';
+      return 'yellow';
     }
 
     if (isSelected) {  
