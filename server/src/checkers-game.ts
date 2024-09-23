@@ -1,10 +1,10 @@
-import { 
+import {
   INITIAL_BOARD_STATE,
-  BOARD_SIZE, 
-  EMPTY_SQUARE, 
-  BLACK_PIECE, 
-  RED_PIECE, 
-  BLACK_KING, 
+  BOARD_SIZE,
+  EMPTY_SQUARE,
+  BLACK_PIECE,
+  RED_PIECE,
+  BLACK_KING,
   RED_KING,
 } from './constants';
 
@@ -39,7 +39,8 @@ export class CheckersGame {
     }
 
     const king = piece === BLACK_KING || piece === RED_KING;
-    const player = piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
+    const player =
+      piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
     const opponent = player === BLACK_PIECE ? RED_PIECE : BLACK_PIECE;
 
     const rowDistance = toRow - fromRow;
@@ -48,7 +49,15 @@ export class CheckersGame {
     // For kings, allow moving any number of diagonal squares
     if (king && Math.abs(rowDistance) === Math.abs(colDistance)) {
       // Check for possible captures first
-      const path = this.findCapturePath(fromRow, fromCol, toRow, toCol, player, opponent, king);
+      const path = this.findCapturePath(
+        fromRow,
+        fromCol,
+        toRow,
+        toCol,
+        player,
+        opponent,
+        king
+      );
       if (path !== null) {
         return true; // Valid king capture move
       }
@@ -89,7 +98,15 @@ export class CheckersGame {
     }
 
     // Check for capture move
-    const path = this.findCapturePath(fromRow, fromCol, toRow, toCol, player, opponent, king);
+    const path = this.findCapturePath(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
+      player,
+      opponent,
+      king
+    );
     if (path !== null) {
       return true;
     }
@@ -140,7 +157,10 @@ export class CheckersGame {
               if (currentPiece === EMPTY_SQUARE) {
                 nextRow += dRow;
                 nextCol += dCol;
-              } else if (currentPiece === opponent || currentPiece === opponent + 2) {
+              } else if (
+                currentPiece === opponent ||
+                currentPiece === opponent + 2
+              ) {
                 // Found an opponent piece to capture
                 const landingRow = nextRow + dRow;
                 const landingCol = nextCol + dCol;
@@ -155,15 +175,22 @@ export class CheckersGame {
                     visited.add(key);
 
                     // Copy board
-                    const newBoard = board.map((r) => r.slice());
+                    const newBoard = board.map(r => r.slice());
                     // Remove captured piece
                     newBoard[nextRow][nextCol] = EMPTY_SQUARE;
                     // Move king
-                    newBoard[landingRow][landingCol] = newBoard[currentRow][currentCol];
+                    newBoard[landingRow][landingCol] =
+                      newBoard[currentRow][currentCol];
                     newBoard[currentRow][currentCol] = EMPTY_SQUARE;
 
                     const newPath = path.slice();
-                    const result = dfs(landingRow, landingCol, newBoard, newPath, false); // Now it's not the first capture
+                    const result = dfs(
+                      landingRow,
+                      landingCol,
+                      newBoard,
+                      newPath,
+                      false
+                    ); // Now it's not the first capture
                     if (result) {
                       return result;
                     }
@@ -188,21 +215,31 @@ export class CheckersGame {
               const midPiece = board[midRow][midCol];
               const landingPiece = board[landingRow][landingCol];
 
-              if ((midPiece === opponent || midPiece === opponent + 2) && landingPiece === EMPTY_SQUARE) {
+              if (
+                (midPiece === opponent || midPiece === opponent + 2) &&
+                landingPiece === EMPTY_SQUARE
+              ) {
                 const key = `${landingRow},${landingCol}`;
                 if (!visited.has(key)) {
                   visited.add(key);
 
                   // Copy board
-                  const newBoard = board.map((r) => r.slice());
+                  const newBoard = board.map(r => r.slice());
                   // Remove captured piece
                   newBoard[midRow][midCol] = EMPTY_SQUARE;
                   // Move king
-                  newBoard[landingRow][landingCol] = newBoard[currentRow][currentCol];
+                  newBoard[landingRow][landingCol] =
+                    newBoard[currentRow][currentCol];
                   newBoard[currentRow][currentCol] = EMPTY_SQUARE;
 
                   const newPath = path.slice();
-                  const result = dfs(landingRow, landingCol, newBoard, newPath, false); // Still not first capture
+                  const result = dfs(
+                    landingRow,
+                    landingCol,
+                    newBoard,
+                    newPath,
+                    false
+                  ); // Still not first capture
                   if (result) {
                     return result;
                   }
@@ -241,11 +278,12 @@ export class CheckersGame {
                 visited.add(key);
 
                 // Copy board
-                const newBoard = board.map((r) => r.slice());
+                const newBoard = board.map(r => r.slice());
                 // Remove captured piece
                 newBoard[midRow][midCol] = EMPTY_SQUARE;
                 // Move piece
-                newBoard[landingRow][landingCol] = newBoard[currentRow][currentCol];
+                newBoard[landingRow][landingCol] =
+                  newBoard[currentRow][currentCol];
                 newBoard[currentRow][currentCol] = EMPTY_SQUARE;
 
                 const newPath = path.slice();
@@ -270,14 +308,15 @@ export class CheckersGame {
       return null;
     };
 
-    const initialBoard = this.board.map((r) => r.slice());
+    const initialBoard = this.board.map(r => r.slice());
     return dfs(fromRow, fromCol, initialBoard, [], true); // Start with firstCapture = true
   }
 
   makeMove(fromRow: number, fromCol: number, toRow: number, toCol: number) {
     const piece = this.getPiece(fromRow, fromCol);
     const king = piece === BLACK_KING || piece === RED_KING;
-    const player = piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
+    const player =
+      piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
     const opponent = player === BLACK_PIECE ? RED_PIECE : BLACK_PIECE;
 
     if (!this.isValidMove(fromRow, fromCol, toRow, toCol)) {
@@ -293,7 +332,15 @@ export class CheckersGame {
       this.setPiece(fromRow, fromCol, EMPTY_SQUARE);
     } else {
       // Capture move
-      const path = this.findCapturePath(fromRow, fromCol, toRow, toCol, player, opponent, king);
+      const path = this.findCapturePath(
+        fromRow,
+        fromCol,
+        toRow,
+        toCol,
+        player,
+        opponent,
+        king
+      );
       if (path !== null) {
         // Move the piece along the path and capture pieces
         for (let i = 1; i < path.length; i++) {
@@ -332,7 +379,10 @@ export class CheckersGame {
           this.setPiece(currentRow, currentCol, piece);
           this.setPiece(prevRow, prevCol, EMPTY_SQUARE);
         }
-      } else if (king && Math.abs(toRow - fromRow) === Math.abs(toCol - fromCol)) {
+      } else if (
+        king &&
+        Math.abs(toRow - fromRow) === Math.abs(toCol - fromCol)
+      ) {
         // King moving multiple squares without capturing
         this.setPiece(toRow, toCol, piece);
         this.setPiece(fromRow, fromCol, EMPTY_SQUARE);
@@ -348,7 +398,11 @@ export class CheckersGame {
       ((player === BLACK_PIECE && toRow === BOARD_SIZE - 1) ||
         (player === RED_PIECE && toRow === 0))
     ) {
-      this.setPiece(toRow, toCol, player === BLACK_PIECE ? BLACK_KING : RED_KING);
+      this.setPiece(
+        toRow,
+        toCol,
+        player === BLACK_PIECE ? BLACK_KING : RED_KING
+      );
     }
 
     // Switch turn
@@ -364,7 +418,8 @@ export class CheckersGame {
       for (let col = 0; col < BOARD_SIZE; col++) {
         const piece = this.getPiece(row, col);
 
-        if (piece === player || piece === player + 2) { // Regular or King
+        if (piece === player || piece === player + 2) {
+          // Regular or King
           const isKing = piece === BLACK_KING || piece === RED_KING;
 
           // Check all possible directions
@@ -428,36 +483,39 @@ export class CheckersGame {
     return false; // No valid moves found
   }
 
-  getValidMovesForPiece(row: number, col: number): Array<{ toRow: number; toCol: number }> {
+  getValidMovesForPiece(
+    row: number,
+    col: number
+  ): Array<{ toRow: number; toCol: number }> {
     if (this.isOutOfBounds(row, col)) return [];
-  
+
     const piece = this.getPiece(row, col);
     if (piece === EMPTY_SQUARE) return [];
-  
+
     const isKing = piece === BLACK_KING || piece === RED_KING;
-    const player = piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
-  
+    const player =
+      piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
+
     // Ensure it's the player's turn
     if (this.turn !== player) return [];
-  
+
     const validMoves: Array<{ toRow: number; toCol: number }> = [];
-  
+
     // Iterate over all possible destination squares
     for (let toRow = 0; toRow < BOARD_SIZE; toRow++) {
       for (let toCol = 0; toCol < BOARD_SIZE; toCol++) {
         // Skip the current position
         if (toRow === row && toCol === col) continue;
-  
+
         // Use isValidMove to check if moving to (toRow, toCol) is valid
         if (this.isValidMove(row, col, toRow, toCol)) {
           validMoves.push({ toRow, toCol });
         }
       }
     }
-  
+
     return validMoves;
   }
-  
 
   getWinner() {
     let blackCount = 0;
@@ -493,27 +551,27 @@ export class CheckersGame {
   }
 
   getPlayersCapturedPiecesCount() {
-      let blackCount = 0;
-      let redCount = 0;
-  
-      for (let i = 0; i < BOARD_SIZE; i++) {
-        for (let j = 0; j < BOARD_SIZE; j++) {
-          const piece = this.getPiece(i, j);
-  
-          if (piece === BLACK_PIECE || piece === BLACK_KING) {
-            blackCount++;
-          } else if (piece === RED_PIECE || piece === RED_KING) {
-            redCount++;
-          }
+    let blackCount = 0;
+    let redCount = 0;
+
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        const piece = this.getPiece(i, j);
+
+        if (piece === BLACK_PIECE || piece === BLACK_KING) {
+          blackCount++;
+        } else if (piece === RED_PIECE || piece === RED_KING) {
+          redCount++;
         }
       }
-      
-      const capturedPieces = {
-        black: 12 - blackCount,
-        red: 12 - redCount
-      }
-      
-      return capturedPieces;
+    }
+
+    const capturedPieces = {
+      black: 12 - blackCount,
+      red: 12 - redCount,
+    };
+
+    return capturedPieces;
   }
 
   getBoard() {
