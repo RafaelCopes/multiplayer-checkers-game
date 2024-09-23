@@ -179,13 +179,11 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
             <CapturedPiece color={player === 1 ? "black" : "red"} />
           </Player>
         )}
-        
         <CapturedPieces>
           {Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
             <CapturedPiece key={index} color={player === 1 ? "red" : "black"} />
           ))}
         </CapturedPieces>
-
         {message && <Message>Warning: {message}</Message>}
       </GameInfo>
       <Wrapper ref={boardRef}>
