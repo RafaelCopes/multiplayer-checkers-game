@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Cell from './Cell';
-import { CapturedPiece, CapturedPieces, Container, Content, GameInfo, Message, Player, Wrapper } from './styles';
+import { CapturedPiece, CapturedPieces, Container, Content, GameInfo, Message, Player, Wrapper, MessageArea } from './styles';
 
 const BOARD_SIZE = 8;
 
@@ -23,26 +23,28 @@ type IPiece = {
   y: number;
 };
 
-export default function Board({ socket }: any) { // Accept the socket as a prop
-  const { roomId } = useParams(); // Get room ID from URL
+export default function Board({ socket }: any) { 
+  const { roomId } = useParams();
   const [piece, setPiece] = useState<IPiece | null>(null);
   const [currentBoardState, setCurrentBoardState] = useState(INITIAL_BOARD_STATE);
   const [turn, setTurn] = useState<number | null>(null);
   const [player, setPlayer] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageKey, setMessageKey] = useState<number>(0);
   const [winner, setWinner] = useState<number | null>(null);
   const [validMoves, setValidMoves] = useState<Array<{ toRow: number; toCol: number }> | null>(null);
   const [blackCapturesPieces, setBlackCapturesPieces] = useState<number>(0);
   const [redCapturesPieces, setRedCapturesPieces] = useState<number>(0);
 
   const boardRef = useRef<HTMLDivElement>(null);
+  
 
   let board: IBoard = [];
   let colorize: number;
 
   useEffect(() => {
     if (roomId) {
-      socket.emit('joinGame', roomId); // Use the existing socket and roomId to join the correct room
+      socket.emit('joinGame', roomId);
     }
 
     socket.on('initializeGameState', (game: any) => {
@@ -59,8 +61,9 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
       setTurn(turn);
       setBlackCapturesPieces(capturedPieces.black);
       setRedCapturesPieces(capturedPieces.red);
-      setMessage(null);
-      setWinner(null);
+      if (!winner) {
+        setMessage(null);
+      }
     });
 
     socket.on('validMoves', (data: any) => {
@@ -85,11 +88,10 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
     });
 
     return () => {
-      // Do not disconnect the socket here; the socket persists throughout the app
+     
     };
   }, [roomId, socket]);
 
-  // Render the board cells
   for (let i = 0; i < BOARD_SIZE; i++) {
     for (let j = 0; j < BOARD_SIZE; j++) {
       colorize = i + j + 1;
@@ -112,15 +114,10 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
   }
 
   const movePiece = (e: any) => {
-    if (turn !== player) {
-      setMessage('Not your turn!');
-      return;
-    }
-  
     let target = e.target;
   
-    // Traverse up the DOM tree to find the element with data attributes
-    while (target && !target.dataset.row) {
+      // Percorre a DOM para encontrar o elemento com os atributos de dados
+      while (target && !target.dataset.row) {
       target = target.parentNode;
     }
   
@@ -137,23 +134,34 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
   
     const clickedPiece = currentBoardState[x][y];
   
+    // Verifica se é vez do jogador ao clicar em uma peça
+    if (clickedPiece !== 0 && (turn !== player || player === null)) {
+      setMessage('Not your turn!');
+      setMessageKey(prev => prev + 1);
+      return;
+    }
+  
     if (piece === null) {
-      // No piece currently selected
-      if (clickedPiece === player || clickedPiece === player + 2) {
-        // Select the piece and get valid moves
+      // Nenhuma peça selecionada
+      if (clickedPiece === 0) {
+        return;
+      } else if (player !== null && (clickedPiece === player || clickedPiece === player + 2)) {
+        // Seleciona a peça e pega os movimentos válidos
         setPiece({ x, y });
         socket.emit('getValidMoves', { roomId, row: x, col: y });
       } else {
+        // Peça do oponente
         setMessage('Not your piece!');
+        setMessageKey(prev => prev + 1);
       }
     } else {
-      // A piece is already selected
-      if (clickedPiece === player || clickedPiece === player + 2) {
-        // Change selection to the new piece
+      // Já tem uma peça selecionada
+      if (player !== null && (clickedPiece === player || clickedPiece === player + 2)) {
+        // Muda a seleção para a nova peça
         setPiece({ x, y });
         socket.emit('getValidMoves', { roomId, row: x, col: y });
       } else {
-        // Attempt to make a move
+        // Tenta fazer um movimento
         socket.emit('makeMove', {
           fromRow: piece.x,
           fromCol: piece.y,
@@ -161,7 +169,7 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
           toCol: y,
         });
   
-        // Unselect the piece and clear valid moves
+        // Desmarca a peça e limpa os movimentos válidos
         setPiece(null);
         setValidMoves(null);
       }
@@ -173,18 +181,20 @@ export default function Board({ socket }: any) { // Accept the socket as a prop
     <Container>
       <GameInfo highlight={turn === player ? true : false}>
         {winner && (winner === 3 ? <h1>Draw! A player was left without valid moves.</h1> : <h1>Winner: Player {winner}!</h1>)}
-        {player && (
+        {player !== null && (
           <Player>
             <h1>You</h1>
             <CapturedPiece color={player === 1 ? "black" : "red"} />
           </Player>
         )}
         <CapturedPieces>
-          {Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
+          {player !== null && Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
             <CapturedPiece key={index} color={player === 1 ? "red" : "black"} />
           ))}
         </CapturedPieces>
-        {message && <Message>Warning: {message}</Message>}
+        <MessageArea>
+          {message && <Message key={messageKey}>{message}</Message>}
+        </MessageArea>
       </GameInfo>
       <Wrapper ref={boardRef}>
         <Content onMouseDown={(e: any) => movePiece(e)}>

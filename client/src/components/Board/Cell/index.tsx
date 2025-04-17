@@ -10,11 +10,11 @@ interface ICellProps {
 }
 
 export default function Cell({ colorize, piece, isSelected, isValidMove, row, col }: ICellProps) : JSX.Element {
-  const cellColor = colorize % 2 === 0 ? "black" : "red";
+  const cellType = colorize % 2 === 0 ? "light" : "dark";
   const imageSrc = piece === 1 ? '/assets/black-checker/standard.svg' : piece === 3 ? '/assets/black-checker/king-me.svg' : piece === 2 ? '/assets/red-checker/standard.svg' : piece === 4 ? '/assets/red-checker/king-me.svg' : '';
 
   return (
-    <Container data-row={row} data-col={col} isSelected={isSelected} cellColor={cellColor} isValidMove={isValidMove}>
+    <Container data-row={row} data-col={col} isSelected={isSelected} cellColor={cellType} isValidMove={isValidMove}>
       <Piece data-row={row} data-col={col} imageSrc={imageSrc} />
     </Container>
   );
