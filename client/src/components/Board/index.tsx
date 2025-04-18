@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Cell from './Cell';
-import { CapturedPiece, CapturedPieces, Container, Content, GameInfo, Message, Player, Wrapper, MessageArea } from './styles';
+import { CapturedPiece, CapturedPieces, Container, Content, GameInfo, Message, Player, Wrapper, MessageArea, GameContent, WinnerMessage, BackButton } from './styles';
 
 const BOARD_SIZE = 8;
 
@@ -25,6 +25,7 @@ type IPiece = {
 
 export default function Board({ socket }: any) { 
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const [piece, setPiece] = useState<IPiece | null>(null);
   const [currentBoardState, setCurrentBoardState] = useState(INITIAL_BOARD_STATE);
   const [turn, setTurn] = useState<number | null>(null);
@@ -37,7 +38,6 @@ export default function Board({ socket }: any) {
   const [redCapturesPieces, setRedCapturesPieces] = useState<number>(0);
 
   const boardRef = useRef<HTMLDivElement>(null);
-  
 
   let board: IBoard = [];
   let colorize: number;
@@ -106,7 +106,7 @@ export default function Board({ socket }: any) {
           col={j}
           isSelected={piece && currentBoardState[i][j] !== 0 ? piece.x === i && piece.y === j : false}
           colorize={colorize}
-          piece={currentBoardState[i][j]} // Ensure the correct piece data is passed
+          piece={currentBoardState[i][j]} 
           isValidMove={isValidMove}
         />
       );
@@ -175,47 +175,60 @@ export default function Board({ socket }: any) {
       }
     }
   };
-  
+
+  const handleBackToHome = () => {
+    navigate('/');
+  };
 
   return (
     <Container>
-      <GameInfo highlight={turn === player ? true : false}>
-        {winner && (winner === 3 ? <h1>Draw! A player was left without valid moves.</h1> : <h1>Winner: Player {winner}!</h1>)}
-        {player !== null && (
-          <Player>
-            <h1>You</h1>
-            <CapturedPiece color={player === 1 ? "black" : "red"} />
-          </Player>
-        )}
-        <CapturedPieces>
-          {player !== null && Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
-            <CapturedPiece key={index} color={player === 1 ? "red" : "black"} />
-          ))}
-        </CapturedPieces>
-        <MessageArea>
-          {message && <Message key={messageKey}>{message}</Message>}
-        </MessageArea>
-      </GameInfo>
-      <Wrapper ref={boardRef}>
-        <Content onMouseDown={(e: any) => movePiece(e)}>
-          {board}
-        </Content>
-      </Wrapper>
-      <GameInfo highlight={turn === (player === 1 ? 2: 1) ? true : false}>
-        {winner && (winner === 3 ? <h1>Draw! A player was left without valid moves.</h1> : <h1>Winner: Player {winner}!</h1>)}
-        {turn ? (
-          <Player>
-            <h1>Opponent</h1>
-            <CapturedPiece color={player === 1 ? "red" : "black"} />
-          </Player>
-        ) : <h1>Waiting for the opponent.</h1>
-        }
-        <CapturedPieces>
-          {Array.from({ length: player === 1 ? blackCapturesPieces : redCapturesPieces  }).map((_, index) => (
-            <CapturedPiece key={index} color={player === 1 ? "black" : "red"} />
-          ))}
-        </CapturedPieces>
-      </GameInfo>
+      {winner && (
+        <WinnerMessage>
+          {winner === 3 ? 'Draw! A player was left without valid moves.' : `Winner: Player ${winner === 1 ? 'Black' : 'Red'}!`}
+          <BackButton onClick={handleBackToHome}>Back to Home</BackButton>
+        </WinnerMessage>
+      )}
+      <GameContent>
+        <GameInfo highlight={turn === player ? true : false}>
+          {player !== null && (
+            <>
+              <Player>
+                <h1>You</h1>
+                <CapturedPiece color={player === 1 ? "black" : "red"} />
+              </Player>
+              <CapturedPieces>
+                {Array.from({ length: player === 1 ? redCapturesPieces : blackCapturesPieces }).map((_, index) => (
+                  <CapturedPiece key={index} color={player === 1 ? "red" : "black"} />
+                ))}
+              </CapturedPieces>
+            </>
+          )}
+          <MessageArea>
+            {message && <Message key={messageKey}>{message}</Message>}
+          </MessageArea>
+        </GameInfo>
+        <Wrapper ref={boardRef}>
+          <Content onMouseDown={(e: any) => movePiece(e)}>
+            {board}
+          </Content>
+        </Wrapper>
+        <GameInfo highlight={turn === (player === 1 ? 2: 1) ? true : false}>
+          {turn ? (
+            <>
+              <Player>
+                <h1>Opponent</h1>
+                <CapturedPiece color={player === 1 ? "red" : "black"} />
+              </Player>
+              <CapturedPieces>
+                {Array.from({ length: player === 1 ? blackCapturesPieces : redCapturesPieces }).map((_, index) => (
+                  <CapturedPiece key={index} color={player === 1 ? "black" : "red"} />
+                ))}
+              </CapturedPieces>
+            </>
+          ) : <h1>Waiting for the opponent.</h1>
+          }
+        </GameInfo>
+      </GameContent>
     </Container>
   );
 }

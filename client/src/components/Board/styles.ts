@@ -17,47 +17,60 @@ const colors = {
 
 // Container principal
 export const Container = styled.div`
-  min-height: 100vh; 
+  min-height: 100vh;
   background: ${colors.background};
   color: ${colors.textPrimary};
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 3rem; 
-  padding: 2rem; 
+  gap: 2rem;
+  padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-  @media (max-width: 1100px) { 
+  @media (max-width: 1100px) {
     flex-direction: column;
     gap: 2rem;
     padding: 1rem;
   }
 `;
 
+export const GameContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+
+  @media (max-width: 1100px) {
+    flex-direction: column;
+    gap: 2rem;
+  }
+`;
+
 export const GameInfo = styled.div<{ highlight: boolean }>`
   display: flex;
   flex-direction: column;
-  justify-content: ; 
+  justify-content: flex-start;
   align-items: center;
-  gap: 1.5rem; 
+  gap: 1.5rem;
 
-  min-height: 610px; 
+  min-height: 610px;
   width: 280px;
 
   background: ${colors.containerBackground};
   background: ${colors.containerBackgroundGradient};
   border-radius: 12px;
-  border: 2px solid ${colors.border}; 
+  border: 2px solid ${colors.border};
   padding: 1.5rem;
   box-shadow: 0px 8px 20px ${colors.shadowColor};
   text-align: center;
-  transition: border-color 0.3s ease-in-out; 
+  transition: border-color 0.3s ease-in-out;
 
   border-color: ${({ highlight }) => (highlight ? colors.accentHover : colors.border)};
 
   h1 {
-    font-size: 1.4rem; 
+    font-size: 1.4rem;
     font-weight: 600;
     color: ${colors.textPrimary};
     margin: 0;
@@ -65,11 +78,11 @@ export const GameInfo = styled.div<{ highlight: boolean }>`
   }
 
   @media (max-width: 1100px) {
-     min-height: auto;
-     width: 100%;
-     max-width: 500px;
-     padding: 1rem;
-     gap: 1rem;
+    min-height: auto;
+    width: 100%;
+    max-width: 500px;
+    padding: 1rem;
+    gap: 1rem;
   }
 
   & > h1:first-child {
@@ -102,39 +115,36 @@ export const Content = styled.div`
 
 export const CapturedPieces = styled.div`
   width: 100%;
+  height: 180px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); 
-  grid-gap: 8px; 
-  margin-top: auto; 
-  padding: 0.5rem;
-  background-color: rgba(0,0,0,0.2); 
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 8px;
+  padding: 1rem;
+  background-color: rgba(0,0,0,0.2);
   border-radius: 8px;
-  min-height: 60px; 
+  margin-top: 0.5rem;
 `;
 
-interface PieceProps {
-  color: 'black' | 'red';
-}
-export const CapturedPiece = styled.div<PieceProps>`
-  width: 45px; 
-  height: 45px;
+export const CapturedPiece = styled.div<{ color: 'black' | 'red' }>`
+  width: 100%;
+  height: 100%;
   background-image: url(${(props) => props.color === 'black' ? '/assets/black-checker/standard.svg': '/assets/red-checker/standard.svg'});
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  border-radius: 50%; 
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.5); 
-  border: 1px solid ${colors.capturedPieceBorder}; 
+  border-radius: 50%;
 `;
 
 export const Player = styled.div`
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 0.8rem; 
+  gap: 0.8rem;
+  width: 100%;
 
-  h1 { 
+  h1 {
     font-size: 1.2rem;
     font-weight: 500;
     color: ${colors.textSecondary};
@@ -144,10 +154,10 @@ export const Player = styled.div`
   }
 
   ${CapturedPiece} {
-     width: 55px;
-     height: 55px;
-     border: none;
-     box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
+    width: 55px;
+    height: 55px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
   }
 `;
 
@@ -159,9 +169,9 @@ const fadeInOut = keyframes`
 `;
 
 export const MessageArea = styled.div`
-  min-height: 50px; 
+  min-height: 50px;
   width: 100%;
-  max-width: 600px; 
+  max-width: 600px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,4 +188,50 @@ export const Message = styled.div`
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   animation: ${fadeInOut} 3s ease-in-out forwards;
+`;
+
+export const WinnerMessage = styled.div`
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: ${colors.accentHover};
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 1rem 2rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid ${colors.accentPrimary};
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+`;
+
+export const BackButton = styled.button`
+  background: ${colors.accentPrimary};
+  color: ${colors.textPrimary};
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &:hover {
+    background: ${colors.accentHover};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 0, 57, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(199, 0, 57, 0.3);
+  }
 `;

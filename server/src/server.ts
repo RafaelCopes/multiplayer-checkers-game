@@ -41,21 +41,21 @@ io.on('connection', socket => {
   socket.on('joinGame', roomId => {
     console.log(`${socket.id} is trying to join room ${roomId}`);
 
-    // Leave any previous rooms (except the default room which is the socket id)
+    // Sai de todas as salas, exceto a sala do socket
     for (const room of socket.rooms) {
       if (room !== socket.id) {
         socket.leave(room);
       }
     }
 
-    // Join the user to the specified room
+    // Entra na sala especificada
     socket.join(roomId);
     console.log(`Player ${socket.id} joined room ${roomId}.`);
 
-    // Keep track of the roomId in the socket
+    // Mantém o rastreio do roomId no socket
     socket.data.roomId = roomId;
 
-    // If room doesn't exist, create a new game
+    // Se a sala não existir, cria um novo jogo
     if (!games[roomId]) {
       games[roomId] = {
         game: new CheckersGame(),
@@ -72,7 +72,7 @@ io.on('connection', socket => {
 
       const game = games[roomId].game;
 
-      // Initialize game for both players by broadcasting to the room
+      // Inicializa o jogo para os jogadores, enviando para a sala
       io.to(roomId).emit('initializeGameState', {
         board: game.getBoard(),
         turn: game.getTurn(),
@@ -106,11 +106,11 @@ io.on('connection', socket => {
       `Move in room ${roomId}: Player ${socket.id} moved from (${fromRow}, ${fromCol}) to (${toRow}, ${toCol})`
     );
 
-    // Make the move in the game object for the room
+    // Faz o movimento no objeto do jogo para a sala
     if (game.makeMove(fromRow, fromCol, toRow, toCol)) {
       console.log(`Move made in room ${roomId}. Broadcasting new game state.`);
 
-      // Broadcast the updated game state to all players in the room
+      // Envia o novo estado do jogo para todos os jogadores na sala
       io.to(roomId).emit('updateGameState', {
         board: game.getBoard(),
         turn: game.getTurn(),
@@ -119,9 +119,9 @@ io.on('connection', socket => {
 
       if (game.getWinner()) {
         console.log(`Game won in room ${roomId} by Player ${game.getWinner()}`);
-        // Broadcast the winner to all players in the room
+        // Envia o vencedor para todos os jogadores na sala
         io.to(roomId).emit('getWinner', { winner: game.getWinner() });
-        delete games[roomId]; // Clean up after the game is won
+        delete games[roomId]; // Limpa após o jogo ser ganho
       }
     }
   });
@@ -144,19 +144,23 @@ io.on('connection', socket => {
     for (const roomId in games) {
       const game = games[roomId];
       if (game.player1 === socket || game.player2 === socket) {
-        console.log(
-          `Cleaning up game in room ${roomId} due to player disconnection.`
-        );
-        if (game.player1)
-          game.player1.emit(
-            'getMessage',
-            'Opponent disconnected, the game will end.'
-          );
-        if (game.player2)
-          game.player2.emit(
-            'getMessage',
-            'Opponent disconnected, the game will end.'
-          );
+        console.log(`Cleaning up game in room ${roomId} due to player disconnection.`);
+        
+        // Determine which player disconnected and who won
+        if (game.player1 === socket) {
+          // Player 1 disconnected, player 2 wins
+          if (game.player2) {
+            game.player2.emit('getWinner', { winner: 2 });
+            game.player2.emit('getMessage', 'Your opponent disconnected. You win!');
+          }
+        } else if (game.player2 === socket) {
+          // Player 2 disconnected, player 1 wins
+          if (game.player1) {
+            game.player1.emit('getWinner', { winner: 1 });
+            game.player1.emit('getMessage', 'Your opponent disconnected. You win!');
+          }
+        }
+
         delete games[roomId]; // Remove the game from the server
         break;
       }

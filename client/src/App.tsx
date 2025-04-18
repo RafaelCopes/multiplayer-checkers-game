@@ -6,7 +6,6 @@ import GlobalStyle from './styles/GlobalStyles';
 
 const ENDPOINT = 'http://localhost:3333';
 
-// Create a socket instance globally, outside of any component
 const socket = io(ENDPOINT);
 
 function App() {

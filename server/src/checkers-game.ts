@@ -46,9 +46,9 @@ export class CheckersGame {
     const rowDistance = toRow - fromRow;
     const colDistance = toCol - fromCol;
 
-    // For kings, allow moving any number of diagonal squares
+    // Para reis, permite mover qualquer número de quadrados diagonais
     if (king && Math.abs(rowDistance) === Math.abs(colDistance)) {
-      // Check for possible captures first
+      // Verifica primeiro possíveis capturas
       const path = this.findCapturePath(
         fromRow,
         fromCol,
@@ -62,7 +62,7 @@ export class CheckersGame {
         return true; // Valid king capture move
       }
 
-      // Ensure no pieces are between the from and to positions for normal moves
+      // Garante que não haja peças entre as posições de origem e destino para movimentos normais
       const directionRow = rowDistance > 0 ? 1 : -1;
       const directionCol = colDistance > 0 ? 1 : -1;
       let currentRow = fromRow + directionRow;
@@ -70,7 +70,7 @@ export class CheckersGame {
 
       while (currentRow !== toRow && currentCol !== toCol) {
         if (this.getPiece(currentRow, currentCol) !== EMPTY_SQUARE) {
-          return false; // Blocked by another piece
+          return false; // Bloqueado por outra peça
         }
         currentRow += directionRow;
         currentCol += directionCol;
@@ -80,10 +80,10 @@ export class CheckersGame {
         return false;
       }
 
-      return true; // Valid king move
+      return true; // Movimento válido de rei
     }
 
-    // Normal piece move (non-king, one square diagonally forward)
+    // Movimento de peça normal (não rei, um quadrado diagonalmente para frente)
     if (Math.abs(rowDistance) === 1 && Math.abs(colDistance) === 1) {
       if (this.turn !== player) {
         return false;
@@ -97,7 +97,7 @@ export class CheckersGame {
       return true;
     }
 
-    // Check for capture move
+    // Verifica movimento de captura
     const path = this.findCapturePath(
       fromRow,
       fromCol,
@@ -135,7 +135,7 @@ export class CheckersGame {
       path.push([currentRow, currentCol]);
 
       if (currentRow === toRow && currentCol === toCol && path.length > 1) {
-        return path.slice(); // Found a valid capture path
+        return path.slice(); // Encontrou um caminho de captura válido
       }
 
       const directions = [
@@ -148,7 +148,7 @@ export class CheckersGame {
       for (const [dRow, dCol] of directions) {
         if (isKing) {
           if (firstCapture) {
-            // For the first capture, the king can look along the diagonal
+            // Para a primeira captura, o rei pode olhar ao longo da diagonal
             let nextRow = currentRow + dRow;
             let nextCol = currentCol + dCol;
 
@@ -161,11 +161,11 @@ export class CheckersGame {
                 currentPiece === opponent ||
                 currentPiece === opponent + 2
               ) {
-                // Found an opponent piece to capture
+                // Encontrou uma peça oponente para capturar
                 const landingRow = nextRow + dRow;
                 const landingCol = nextCol + dCol;
 
-                // Check if landing square is empty and within bounds
+                // Verifica se a posição de destino está vazia e dentro dos limites
                 if (
                   !this.isOutOfBounds(landingRow, landingCol) &&
                   board[landingRow][landingCol] === EMPTY_SQUARE
@@ -174,11 +174,11 @@ export class CheckersGame {
                   if (!visited.has(key)) {
                     visited.add(key);
 
-                    // Copy board
+                    // Copia o tabuleiro
                     const newBoard = board.map(r => r.slice());
-                    // Remove captured piece
+                    // Remove a peça capturada
                     newBoard[nextRow][nextCol] = EMPTY_SQUARE;
-                    // Move king
+                    // Move o rei
                     newBoard[landingRow][landingCol] =
                       newBoard[currentRow][currentCol];
                     newBoard[currentRow][currentCol] = EMPTY_SQUARE;
@@ -190,7 +190,7 @@ export class CheckersGame {
                       newBoard,
                       newPath,
                       false
-                    ); // Now it's not the first capture
+                    ); // Não é a primeira captura
                     if (result) {
                       return result;
                     }
@@ -198,14 +198,14 @@ export class CheckersGame {
                     visited.delete(key);
                   }
                 }
-                break; // Can't capture multiple pieces in one direction without landing
+                break; // Não pode capturar múltiplas peças em uma direção sem pular
               } else {
-                // Blocked by own piece
+                // Bloqueado por sua própria peça
                 break;
               }
             }
           } else {
-            // For subsequent captures, the king can only capture adjacent opponent pieces
+            // Para novas capturas na sequência, o rei só pode capturar peças oponentes adjacentes
             const midRow = currentRow + dRow;
             const midCol = currentCol + dCol;
             const landingRow = currentRow + 2 * dRow;
@@ -223,11 +223,11 @@ export class CheckersGame {
                 if (!visited.has(key)) {
                   visited.add(key);
 
-                  // Copy board
+                  // Copia o tabuleiro
                   const newBoard = board.map(r => r.slice());
-                  // Remove captured piece
+                  // Remove a peça capturada
                   newBoard[midRow][midCol] = EMPTY_SQUARE;
-                  // Move king
+                  // Move o rei
                   newBoard[landingRow][landingCol] =
                     newBoard[currentRow][currentCol];
                   newBoard[currentRow][currentCol] = EMPTY_SQUARE;
@@ -239,7 +239,7 @@ export class CheckersGame {
                     newBoard,
                     newPath,
                     false
-                  ); // Still not first capture
+                  ); // Ainda não é a primeira captura
                   if (result) {
                     return result;
                   }
@@ -250,7 +250,7 @@ export class CheckersGame {
             }
           }
         } else {
-          // For regular pieces
+          // Para peças normais
           const midRow = currentRow + dRow;
           const midCol = currentCol + dCol;
           const landingRow = currentRow + 2 * dRow;
@@ -264,12 +264,12 @@ export class CheckersGame {
               (midPiece === opponent || midPiece === opponent + 2) &&
               landingPiece === EMPTY_SQUARE
             ) {
-              // Enforce forward capture for the first capture
+              // Impedir captura para a frente para a primeira captura
               if (firstCapture) {
                 const dRowCapture = landingRow - currentRow;
                 const forwardDirection = player === BLACK_PIECE ? 2 : -2;
                 if (dRowCapture !== forwardDirection) {
-                  continue; // Skip this capture as it's not forward
+                  continue; // Pular esta captura como não é para a frente
                 }
               }
 
@@ -277,11 +277,11 @@ export class CheckersGame {
               if (!visited.has(key)) {
                 visited.add(key);
 
-                // Copy board
+                // Copia o tabuleiro
                 const newBoard = board.map(r => r.slice());
-                // Remove captured piece
+                // Remove a peça capturada
                 newBoard[midRow][midCol] = EMPTY_SQUARE;
-                // Move piece
+                // Move a peça
                 newBoard[landingRow][landingCol] =
                   newBoard[currentRow][currentCol];
                 newBoard[currentRow][currentCol] = EMPTY_SQUARE;
@@ -292,7 +292,7 @@ export class CheckersGame {
                   landingCol,
                   newBoard,
                   newPath,
-                  false // After first capture
+                  false // Depois da primeira captura
                 );
                 if (result) {
                   return result;
@@ -309,7 +309,7 @@ export class CheckersGame {
     };
 
     const initialBoard = this.board.map(r => r.slice());
-    return dfs(fromRow, fromCol, initialBoard, [], true); // Start with firstCapture = true
+    return dfs(fromRow, fromCol, initialBoard, [], true); // firstCapture = true
   }
 
   makeMove(fromRow: number, fromCol: number, toRow: number, toCol: number) {
@@ -327,11 +327,11 @@ export class CheckersGame {
     const colDistance = Math.abs(toCol - fromCol);
 
     if (rowDistance === 1 && colDistance === 1) {
-      // Simple move
+      // Movimento simples
       this.setPiece(toRow, toCol, piece);
       this.setPiece(fromRow, fromCol, EMPTY_SQUARE);
     } else {
-      // Capture move
+      // Movimento de captura
       const path = this.findCapturePath(
         fromRow,
         fromCol,
@@ -342,7 +342,7 @@ export class CheckersGame {
         king
       );
       if (path !== null) {
-        // Move the piece along the path and capture pieces
+        // Move a peça ao longo do caminho e captura peças
         for (let i = 1; i < path.length; i++) {
           const [prevRow, prevCol] = path[i - 1];
           const [currentRow, currentCol] = path[i];
@@ -359,23 +359,23 @@ export class CheckersGame {
           while (midRow !== currentRow && midCol !== currentCol) {
             const midPiece = this.getPiece(midRow, midCol);
             if (midPiece === opponent || midPiece === opponent + 2) {
-              this.setPiece(midRow, midCol, EMPTY_SQUARE); // Remove captured piece
+              this.setPiece(midRow, midCol, EMPTY_SQUARE); // Remove a peça capturada
               captured = true;
-              break; // Stop after removing one piece
+              break; // Parar após remover uma peça
             } else if (midPiece !== EMPTY_SQUARE) {
-              // Move blocked by another piece
+              // Movimento bloqueado por outra peça
               return false;
             }
             midRow += stepRow;
             midCol += stepCol;
           }
 
-          // Ensure a piece was captured; if not, the move is invalid
+          // Certifique-se de que uma peça foi capturada; se não, o movimento é inválido
           if (!captured) {
             return false;
           }
 
-          // Move the piece to the next position
+          // Move a peça para a próxima posição
           this.setPiece(currentRow, currentCol, piece);
           this.setPiece(prevRow, prevCol, EMPTY_SQUARE);
         }
@@ -383,16 +383,16 @@ export class CheckersGame {
         king &&
         Math.abs(toRow - fromRow) === Math.abs(toCol - fromCol)
       ) {
-        // King moving multiple squares without capturing
+        // Rei movendo vários quadrados sem capturar
         this.setPiece(toRow, toCol, piece);
         this.setPiece(fromRow, fromCol, EMPTY_SQUARE);
       } else {
-        // Invalid move
+        // Movimento inválido
         return false;
       }
     }
 
-    // Crown the piece if it reaches the last row
+    // Coroa a peça se chegar à última linha
     if (
       !king &&
       ((player === BLACK_PIECE && toRow === BOARD_SIZE - 1) ||
@@ -405,7 +405,7 @@ export class CheckersGame {
       );
     }
 
-    // Switch turn
+    // Troca de turno
     this.turn = this.turn === BLACK_PIECE ? RED_PIECE : BLACK_PIECE;
 
     return true;
@@ -419,10 +419,10 @@ export class CheckersGame {
         const piece = this.getPiece(row, col);
 
         if (piece === player || piece === player + 2) {
-          // Regular or King
+          // Peça regular ou Rei
           const isKing = piece === BLACK_KING || piece === RED_KING;
 
-          // Check all possible directions
+          // Verifica todas as direções possíveis
           const directions = [
             [-1, -1],
             [-1, 1],
@@ -434,22 +434,22 @@ export class CheckersGame {
             const toRow = row + dRow;
             const toCol = col + dCol;
 
-            // Simple move
+            // Movimento simples
             if (
               !this.isOutOfBounds(toRow, toCol) &&
               this.getPiece(toRow, toCol) === EMPTY_SQUARE
             ) {
-              // For normal pieces, ensure movement is forward
+              // Para peças normais, certifica de que o movimento é para a frente
               if (!isKing) {
                 const forwardDirection = player === BLACK_PIECE ? 1 : -1;
                 if (dRow !== forwardDirection) {
                   continue;
                 }
               }
-              return true; // Found a valid simple move
+              return true; // Encontrou um movimento válido simples
             }
 
-            // Capture move
+            // Movimento de captura
             const captureRow = row + 2 * dRow;
             const captureCol = col + 2 * dCol;
 
@@ -463,16 +463,16 @@ export class CheckersGame {
 
               if (
                 midPiece === opponent ||
-                midPiece === opponent + 2 // Opponent's piece or king
+                midPiece === opponent + 2 // Peça oponente ou rei
               ) {
-                // For normal pieces, ensure capture is forward
+                // Para peças normais, certifica de que a captura é para a frente
                 if (!isKing) {
                   const forwardDirection = player === BLACK_PIECE ? 1 : -1;
                   if (dRow !== forwardDirection) {
                     continue;
                   }
                 }
-                return true; // Found a valid capture move
+                return true; // Encontrou um movimento de captura válido
               }
             }
           }
@@ -480,7 +480,7 @@ export class CheckersGame {
       }
     }
 
-    return false; // No valid moves found
+    return false; // Nenhum movimento válido encontrado
   }
 
   getValidMovesForPiece(
@@ -496,18 +496,18 @@ export class CheckersGame {
     const player =
       piece === BLACK_PIECE || piece === BLACK_KING ? BLACK_PIECE : RED_PIECE;
 
-    // Ensure it's the player's turn
+    // Certifica de que é a vez do jogador
     if (this.turn !== player) return [];
 
     const validMoves: Array<{ toRow: number; toCol: number }> = [];
 
-    // Iterate over all possible destination squares
+    // Itera sobre todas as posições de destino possíveis
     for (let toRow = 0; toRow < BOARD_SIZE; toRow++) {
       for (let toCol = 0; toCol < BOARD_SIZE; toCol++) {
-        // Skip the current position
+        // Pula a posição atual
         if (toRow === row && toCol === col) continue;
 
-        // Use isValidMove to check if moving to (toRow, toCol) is valid
+        // Verifica se mover para (toRow, toCol) é válido
         if (this.isValidMove(row, col, toRow, toCol)) {
           validMoves.push({ toRow, toCol });
         }
@@ -533,21 +533,21 @@ export class CheckersGame {
       }
     }
 
-    // Check if either player has no pieces left
+    // Verifica se algum jogador não tem peças restantes
     if (blackCount === 0) {
-      return RED_PIECE; // Red wins
+      return RED_PIECE; // Vermelho vence
     } else if (redCount === 0) {
-      return BLACK_PIECE; // Black wins
+      return BLACK_PIECE; // Preto vence
     }
 
-    // Check if the next player has any valid moves
+    // Verifica se o próximo jogador tem algum movimento válido
     const nextPlayer = this.turn;
     if (!this.hasValidMoves(nextPlayer)) {
       console.log(`Player ${nextPlayer} has no valid moves.`);
-      return 3; // Draw
+      return 3; // Empate
     }
 
-    return null; // Game continues
+    return null; // O jogo continua
   }
 
   getPlayersCapturedPiecesCount() {
