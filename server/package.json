@@ -1,10 +1,13 @@
 {
   "name": "checkers-game",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/server.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsx watch src/server.ts"
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "prebuild": "rm -rf dist"
   },
   "dependencies": {
     "cors": "^2.8.5",

@@ -6,22 +6,31 @@ import path from 'node:path';
 import { v4 as uuid } from 'uuid';
 import { CheckersGame } from './checkers-game.js';
 
-const PORT = 3333;
+const PORT = process.env.PORT || 3333;
+const isProduction = process.env.NODE_ENV === 'production';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: isProduction ? false : '*',
     methods: ['GET', 'POST'],
   },
 });
 
 app.use(cors());
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', '..', 'client', 'index.html'));
-});
+if (isProduction) {
+  app.use(express.static(path.join(__dirname, '../../client/dist')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  });
+} else {
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', '..', 'client', 'index.html'));
+  });
+}
 
 const games: {
   [roomId: string]: { game: CheckersGame; player1: any; player2: any };
