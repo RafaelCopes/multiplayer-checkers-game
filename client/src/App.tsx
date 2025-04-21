@@ -4,7 +4,7 @@ import GameOptions from './components/GameOptions';
 import Board from './components/Board';
 import GlobalStyle from './styles/GlobalStyles';
 
-const ENDPOINT = 'http://localhost:3333';
+const ENDPOINT = import.meta.env.VITE_SOCKET_ENDPOINT || 'http://localhost:3333';
 
 const socket = io(ENDPOINT);
 
